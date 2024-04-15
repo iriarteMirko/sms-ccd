@@ -68,7 +68,8 @@ def main():
         global inicio_sap
         progressbar.start()
         try:
-            reporte.exportar_deudores_sap()
+            reporte.exportar_deudores()
+            os.startfile(resource_path("./bases/Deudores.xlsx"))
             inicio_sap = time.time()
         except Exception as e:
             messagebox.showerror("ERROR", "Algo salió mal. Por favor, intente nuevamente.\nDetalles: " + str(e))
@@ -89,14 +90,18 @@ def main():
             progressbar.stop()
 
     def accion_boton4():
+        global fin
         progressbar.start()
         try:
             reporte.exportar_archivos_txt()
             fin = time.time()
-            messagebox.showinfo("SMS C&CD", "MENSAJES LISTOS!")
-            messagebox.showerror("TIEMPOS", "DEMORA SAP: " + str(round(fin_sap - inicio_sap, 2)) + " segundos." 
-                                + "\nDEMORA PROCESO: " + str(round((fin-inicio)-(fin_sap - inicio_sap), 2)) + " segundos." 
-                                + "\nDEMORA TOTAL: " + str(round(fin - inicio, 2)) + " segundos.")
+            tiempo_sap = fin_sap - inicio_sap
+            tiempo_total = fin - inicio
+            tiempo_proceso = tiempo_total - tiempo_sap
+            messagebox.showinfo("SMS C&CD", "MENSAJES LISTOS!\n"
+                                + "\nTiempo Proceso: " + str(round(tiempo_proceso, 2)) + " segundos."
+                                + "\nTiempo SAP: " + str(round(tiempo_sap, 2)) + " segundos."
+                                + "\nTiempo Total: " + str(round(tiempo_total, 2)) + " segundos.")
         except Exception as e:
             messagebox.showerror("ERROR", "Algo salió mal. Por favor, intente nuevamente.\nDetalles: " + str(e))
         finally:

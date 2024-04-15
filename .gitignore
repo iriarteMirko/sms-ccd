@@ -1,3 +1,11 @@
+# Ignorar archivos:
+*.txt
+*.xlsx
+*.xls
+*.xlsm
+*.docx
+*.csv
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

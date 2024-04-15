@@ -15,15 +15,15 @@ class Clase_SMS:
         self.reporte_recaudacion = "./bases/Reporte_Recaudacion_" + self.fecha_hoy + ".csv"
         self.deudores_sap = "./bases/Deudores_SAP.xlsx"
         
-        self.modelo = "./modelo_zfir_recaudacion/Modelo de Evaluación de Pedidos de Equipos_" + self.fecha_hoy + ".xlsx"
-        self.zfir = "./modelo_zfir_recaudacion/Zfir" + self.fecha_hoy + ".xlsx"
-        self.recaudacion = "./modelo_zfir_recaudacion/Recaudacion_" + self.fecha_hoy + ".xlsx"
+        self.modelo = "./modelo-zfir-recaudacion/Modelo de Evaluación de Pedidos de Equipos_" + self.fecha_hoy + ".xlsx"
+        self.zfir = "./modelo-zfir-recaudacion/Zfir" + self.fecha_hoy + ".xlsx"
+        self.recaudacion = "./modelo-zfir-recaudacion/Recaudacion_" + self.fecha_hoy + ".xlsx"
         
         self.ruta_dacxanalista = ruta_dacxanalista
         self.ruta_base_celulares = "./bases/Base_Celulares_CCD.xlsx"
         
-        self.ld = "./archivos txt/LD " + self.fecha_hoy_txt + ".txt"
-        self.nivel_1 = "./archivos txt/Nivel 1 " + self.fecha_hoy_txt + ".txt"
+        self.ld = "./archivos-txt/LD " + self.fecha_hoy_txt + ".txt"
+        self.nivel_1 = "./archivos-txt/Nivel 1 " + self.fecha_hoy_txt + ".txt"
 
     def abrir_reporte(self, ruta):
         os.startfile(ruta)

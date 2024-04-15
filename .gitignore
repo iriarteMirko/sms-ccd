@@ -1,10 +1,12 @@
 # Ignorar archivos:
-*.txt
 *.xlsx
 *.xls
 *.xlsm
 *.docx
 *.csv
+archivos-txt/
+bases/
+modelo-zfir-recaudacion/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

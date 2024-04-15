@@ -52,8 +52,10 @@ def main():
         app.after(1000, verificar_thread, thread)
 
     def accion_boton1():
+        global inicio
         progressbar.start()
         try:
+            inicio = time.time()
             reporte.traer_archivos()
             reporte.preparar_zfir60()
             messagebox.showinfo("PASO 1", "COMPLETADO")
@@ -63,17 +65,21 @@ def main():
             progressbar.stop()
 
     def accion_boton2():
+        global inicio_sap
         progressbar.start()
         try:
             reporte.exportar_deudores_sap()
+            inicio_sap = time.time()
         except Exception as e:
             messagebox.showerror("ERROR", "Algo salió mal. Por favor, intente nuevamente.\nDetalles: " + str(e))
         finally:
             progressbar.stop()
 
     def accion_boton3():
+        global fin_sap
         progressbar.start()
         try:
+            fin_sap = time.time()
             reporte.preparar_fbl5n()
             reporte.preparar_recaudacion()
             messagebox.showinfo("PASO 2", "COMPLETADO")
@@ -86,7 +92,11 @@ def main():
         progressbar.start()
         try:
             reporte.exportar_archivos_txt()
+            fin = time.time()
             messagebox.showinfo("SMS C&CD", "MENSAJES LISTOS!")
+            messagebox.showerror("TIEMPOS", "DEMORA SAP: " + str(round(fin_sap - inicio_sap, 2)) + " segundos." 
+                                + "\nDEMORA PROCESO: " + str(round((fin-inicio)-(fin_sap - inicio_sap), 2)) + " segundos." 
+                                + "\nDEMORA TOTAL: " + str(round(fin - inicio, 2)) + " segundos.")
         except Exception as e:
             messagebox.showerror("ERROR", "Algo salió mal. Por favor, intente nuevamente.\nDetalles: " + str(e))
         finally:

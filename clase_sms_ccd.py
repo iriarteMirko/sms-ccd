@@ -1,6 +1,5 @@
 import pandas as pd
 import shutil
-import os
 
 class Clase_SMS:
     def __init__(self, fecha_hoy, fecha_ayer, fecha_hoy_txt, ruta_zfir60, ruta_modelo, ruta_dacxanalista):
@@ -19,7 +18,7 @@ class Clase_SMS:
         self.zfir = "./modelo-zfir-recaudacion/Zfir" + self.fecha_hoy + ".xlsx"
         self.recaudacion = "./modelo-zfir-recaudacion/Recaudacion_" + self.fecha_hoy + ".xlsx"
         
-        self.ruta_dacxanalista = ruta_dacxanalista
+        self.ruta_dacxanalista = ruta_dacxanalista + "/Nuevo_DACxANALISTA.xlsx"
         self.ruta_base_celulares = "./bases/Base_Celulares_CCD.xlsx"
         
         self.ld = "./archivos-txt/LD " + self.fecha_hoy_txt + ".txt"

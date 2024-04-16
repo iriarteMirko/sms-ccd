@@ -16,122 +16,134 @@ def resource_path(relative_path):
         base_path = os.path.abspath(".")
     return os.path.join(base_path, relative_path)
 
-def main():
+class Clase_App_SMS():
+    def __init__(self):
+        self.reporte = None
+        self.inicio = None
+        self.inicio_sap = None
+        self.fin_sap = None
+        self.fin = None
     
-    def salir():
-        app.destroy()
+    def salir(self):
+        self.app.destroy()
 
-    def verificar_thread(thread):
+    def deshabilitar_botones(self):
+        self.boton1.configure(state="disabled")
+        self.boton2.configure(state="disabled")
+        self.boton3.configure(state="disabled")
+        self.boton4.configure(state="disabled")
+        self.boton_salir.configure(state="disabled")
+
+    def habilitar_botones(self):
+        self.boton1.configure(state="normal")
+        self.boton2.configure(state="normal")
+        self.boton3.configure(state="normal")
+        self.boton4.configure(state="normal")
+        self.boton_salir.configure(state="normal")
+
+    def verificar_thread(self, thread):
         if thread.is_alive():
-            app.after(1000, verificar_thread, thread)
+            self.app.after(1000, self.verificar_thread, thread)
         else:
-            boton1.configure(state="normal")
-            boton2.configure(state="normal")
-            boton3.configure(state="normal")
-            boton4.configure(state="normal")
-            boton_salir.configure(state="normal")
+            self.habilitar_botones()
 
-    def iniciar_proceso(accion):
+    def iniciar_proceso(self, accion):
+        self.deshabilitar_botones()
         if accion == 1:
-            thread = threading.Thread(target=accion_boton1)
+            thread = threading.Thread(target=self.accion_boton1)
         elif accion == 2:
-            thread = threading.Thread(target=accion_boton2)
+            thread = threading.Thread(target=self.accion_boton2)
         elif accion == 3:
-            thread = threading.Thread(target=accion_boton3)
+            thread = threading.Thread(target=self.accion_boton3)
         elif accion == 4:
-            thread = threading.Thread(target=accion_boton4)
+            thread = threading.Thread(target=self.accion_boton4)
         else:
-            pass
-        boton1.configure(state="disabled")
-        boton2.configure(state="disabled")
-        boton3.configure(state="disabled")
-        boton4.configure(state="disabled")
-        boton_salir.configure(state="disabled")
-        
+            return        
         thread.start()
-        app.after(1000, verificar_thread, thread)
+        self.app.after(1000, self.verificar_thread, thread)
 
-    def accion_boton1():
-        global inicio
-        progressbar.start()
+    def accion_boton1(self):
+        self.progressbar.start()
         try:
-            inicio = time.time()
-            reporte.traer_archivos()
-            reporte.preparar_zfir60()
+            self.inicio = time.time()
+            self.reporte.traer_archivos()
+            self.reporte.preparar_zfir60()
             messagebox.showinfo("PASO 1", "COMPLETADO")
         except Exception as e:
-            messagebox.showerror("ERROR", "Algo salió mal. Por favor, intente nuevamente.\nDetalles: " + str(e))
+            messagebox.showerror("ERROR", "Algo salió mal. Por favor, intente nuevamente.\n\nDetalles: " + str(e))
         finally:
-            progressbar.stop()
+            self.progressbar.stop()
 
-    def accion_boton2():
-        global inicio_sap
-        progressbar.start()
+    def accion_boton2(self):
+        self.progressbar.start()
         try:
-            reporte.exportar_deudores()
+            self.reporte.exportar_deudores()
             os.startfile(resource_path("./bases/Deudores.xlsx"))
-            inicio_sap = time.time()
+            self.inicio_sap = time.time()
         except Exception as e:
-            messagebox.showerror("ERROR", "Algo salió mal. Por favor, intente nuevamente.\nDetalles: " + str(e))
+            messagebox.showerror("ERROR", "Algo salió mal. Por favor, intente nuevamente.\n\nDetalles: " + str(e))
         finally:
-            progressbar.stop()
+            self.progressbar.stop()
 
-    def accion_boton3():
-        global fin_sap
-        progressbar.start()
+    def accion_boton3(self):
+        self.progressbar.start()
         try:
-            fin_sap = time.time()
-            reporte.preparar_fbl5n()
-            reporte.preparar_recaudacion()
+            self.fin_sap = time.time()
+            self.reporte.preparar_fbl5n()
+            self.reporte.preparar_recaudacion()
             messagebox.showinfo("PASO 2", "COMPLETADO")
         except Exception as e:
-            messagebox.showerror("ERROR", "Algo salió mal. Por favor, intente nuevamente.\nDetalles: " + str(e))
+            messagebox.showerror("ERROR", "Algo salió mal. Por favor, intente nuevamente.\n\nDetalles: " + str(e))
         finally:
-            progressbar.stop()
+            self.progressbar.stop()
 
-    def accion_boton4():
-        global fin
-        progressbar.start()
+    def accion_boton4(self):
+        self.progressbar.start()
         try:
-            reporte.exportar_archivos_txt()
-            fin = time.time()
-            tiempo_sap = fin_sap - inicio_sap
-            tiempo_total = fin - inicio
+            self.reporte.exportar_archivos_txt()
+            self.fin = time.time()
+            tiempo_sap = self.fin_sap - self.inicio_sap
+            tiempo_total = self.fin - self.inicio
             tiempo_proceso = tiempo_total - tiempo_sap
-            messagebox.showinfo("SMS C&CD", "MENSAJES LISTOS!\n"
+            messagebox.showinfo("SMS C&CD", "MENSAJES LISTOS!\n\n"
                                 + "\nTiempo Proceso: " + str(round(tiempo_proceso, 2)) + " segundos."
                                 + "\nTiempo SAP: " + str(round(tiempo_sap, 2)) + " segundos."
                                 + "\nTiempo Total: " + str(round(tiempo_total, 2)) + " segundos.")
         except Exception as e:
             messagebox.showerror("ERROR", "Algo salió mal. Por favor, intente nuevamente.\nDetalles: " + str(e))
         finally:
-            progressbar.stop()
+            self.progressbar.stop()
 
-    def generar_reporte():
-        global reporte
-        excel_rutas = resource_path("./RUTAS.xlsx")
-        df_rutas = pd.read_excel(excel_rutas)
-        fecha_hoy = datetime.today()
-        fecha_ayer = fecha_hoy - timedelta(days=1)
-        fecha_ayer = fecha_ayer.strftime("%Y%m%d")
-        fecha_hoy = datetime.today().strftime("%Y%m%d")
-        fecha_hoy_txt = datetime.today().strftime("%d.%m.%Y")
-        ruta_zfir60 = df_rutas["RUTA"][0]
-        ruta_modelo = df_rutas["RUTA"][1]
-        ruta_dacxanalista = df_rutas["RUTA"][2]
-        
-        reporte = Clase_SMS(fecha_hoy, fecha_ayer, fecha_hoy_txt, ruta_zfir60, ruta_modelo, ruta_dacxanalista)
+    def generar_reporte(self):
+        try:
+            excel_rutas = resource_path("./RUTAS.xlsx")
+            df_rutas = pd.read_excel(excel_rutas)
+            fecha_hoy = datetime.today()
+            fecha_ayer = fecha_hoy - timedelta(days=1)
+            fecha_ayer = fecha_ayer.strftime("%Y%m%d")
+            fecha_hoy = datetime.today().strftime("%Y%m%d")
+            fecha_hoy_txt = datetime.today().strftime("%d.%m.%Y")
+            ruta_zfir60 = df_rutas["RUTA"][0]
+            ruta_modelo = df_rutas["RUTA"][1]
+            ruta_dacxanalista = df_rutas["RUTA"][2]
+            self.reporte = Clase_SMS(fecha_hoy, fecha_ayer, fecha_hoy_txt, ruta_zfir60, ruta_modelo, ruta_dacxanalista)
+        except Exception as e:
+            messagebox.showerror("ERROR", "Algo salió mal. Por favor, intente nuevamente.\n\nDetalles: " + str(e)
+                                + "\n\nAsegúrese de tener el archivo 'RUTAS.xlsx' en la misma carpeta que el ejecutable.")
+            self.app.destroy()
 
-    def crear_app():
-        global app, boton1, boton2, boton3, boton4, progressbar, boton_salir
-        generar_reporte()
-        app = CTk()
-        app.title("SMS C&CD")
-        app.iconbitmap(resource_path("./images/icono.ico"))
-        app.resizable(False, False)
+    def crear_app(self):        
+        self.app = CTk()
+        self.app.title("SMS C&CD")
+        icon_path = resource_path("./images/icono.ico")
+        if os.path.isfile(icon_path):
+            self.app.iconbitmap(icon_path)
+        else:
+            messagebox.showwarning("ADVERTENCIA", "No se encontró el archivo 'icono.ico' en la ruta: " + icon_path)
+        self.app.resizable(False, False)
         set_appearance_mode("light")
         
-        main_frame = CTkFrame(app)
+        main_frame = CTkFrame(self.app)
         main_frame.pack_propagate(0)
         main_frame.pack(fill="both", expand=True)
         
@@ -144,38 +156,41 @@ def main():
         frame_botones = CTkFrame(main_frame)
         frame_botones.grid(row=1, column=0, padx=(20, 20), pady=(20, 0), sticky="nsew")
         
-        boton1 = CTkButton(frame_botones, text=">>> PASO 1 <<<", font=("Calibri",17), text_color="black", 
+        self.boton1 = CTkButton(frame_botones, text=">>> PASO 1 <<<", font=("Calibri",17), text_color="black", 
                             fg_color="transparent", border_color="black", border_width=3, hover_color="#d11515", 
-                            width=25, corner_radius=10, command=lambda: iniciar_proceso(1))
-        boton1.pack(anchor="center", fill="both", expand=True, ipady=10, padx=(20, 20), pady=(20, 0))
+                            width=25, corner_radius=10, command=lambda: self.iniciar_proceso(1))
+        self.boton1.pack(anchor="center", fill="both", expand=True, ipady=10, padx=(20, 20), pady=(20, 0))
         
-        boton2 = CTkButton(frame_botones, text="EXPORTAR DEUDORES SAP", font=("Calibri",17), text_color="black", 
+        self.boton2 = CTkButton(frame_botones, text="EXPORTAR DEUDORES SAP", font=("Calibri",17), text_color="black", 
                             fg_color="transparent", border_color="black", border_width=3, hover_color="#d11515", 
-                            width=25, corner_radius=10, command=lambda: iniciar_proceso(2))
-        boton2.pack(anchor="center", fill="both", expand=True, ipady=10, padx=(20, 20), pady=(20, 0))
+                            width=25, corner_radius=10, command=lambda: self.iniciar_proceso(2))
+        self.boton2.pack(anchor="center", fill="both", expand=True, ipady=10, padx=(20, 20), pady=(20, 0))
         
-        boton3 = CTkButton(frame_botones, text=">>> PASO 2 <<<", font=("Calibri",17), text_color="black", 
+        self.boton3 = CTkButton(frame_botones, text=">>> PASO 2 <<<", font=("Calibri",17), text_color="black", 
                             fg_color="transparent", border_color="black", border_width=3, hover_color="#d11515", 
-                            width=25, corner_radius=10, command=lambda: iniciar_proceso(3))
-        boton3.pack(anchor="center", fill="both", expand=True, ipady=10, padx=(20, 20), pady=(20, 0))
+                            width=25, corner_radius=10, command=lambda: self.iniciar_proceso(3))
+        self.boton3.pack(anchor="center", fill="both", expand=True, ipady=10, padx=(20, 20), pady=(20, 0))
         
-        boton4 = CTkButton(frame_botones, text="EXPORTAR ARCHIVOS TXT", font=("Calibri",17), text_color="black", 
+        self.boton4 = CTkButton(frame_botones, text="EXPORTAR ARCHIVOS TXT", font=("Calibri",17), text_color="black", 
                             fg_color="transparent", border_color="black", border_width=3, hover_color="#d11515", 
-                            width=25, corner_radius=10, command=lambda: iniciar_proceso(4))
-        boton4.pack(anchor="center", fill="both", expand=True, ipady=10, padx=(20, 20), pady=(20, 20))
+                            width=25, corner_radius=10, command=lambda: self.iniciar_proceso(4))
+        self.boton4.pack(anchor="center", fill="both", expand=True, ipady=10, padx=(20, 20), pady=(20, 20))
         
-        progressbar = CTkProgressBar(main_frame, mode="indeterminate", orientation="horizontal", 
+        self.progressbar = CTkProgressBar(main_frame, mode="indeterminate", orientation="horizontal", 
                                         progress_color="#d11515", height=10, border_width=0)
-        progressbar.grid(row=2, column=0, padx=(20, 20), pady=(10, 0), sticky="nsew")
+        self.progressbar.grid(row=2, column=0, padx=(20, 20), pady=(10, 0), sticky="nsew")
         
-        boton_salir = CTkButton(main_frame, text="SALIR", font=("Calibri",17), text_color="black", 
+        self.boton_salir = CTkButton(main_frame, text="SALIR", font=("Calibri",17), text_color="black", 
                                 fg_color="transparent", border_color="black", border_width=3, hover_color="#d11515", 
-                                width=10, corner_radius=10, command=salir)
-        boton_salir.grid(row=3, column=0, padx=(150, 150), pady=(20, 20), sticky="nsew")
+                                width=10, corner_radius=10, command=self.salir)
+        self.boton_salir.grid(row=3, column=0, padx=(150, 150), pady=(20, 20), sticky="nsew")
         
-        app.mainloop()
+        self.app.mainloop()
 
-    crear_app()
+def main():
+    app = Clase_App_SMS()
+    app.generar_reporte()
+    app.crear_app()
 
 if __name__ == "__main__":
     main()

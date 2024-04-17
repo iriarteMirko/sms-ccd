@@ -2,6 +2,7 @@ from clase_sms_ccd import Clase_SMS
 from datetime import datetime, timedelta
 from tkinter import messagebox
 from customtkinter import *
+from resource_path import *
 import pandas as pd
 import warnings
 import threading
@@ -9,44 +10,30 @@ import time
 
 warnings.filterwarnings("ignore")
 
-def resource_path(relative_path):
-    try:
-        base_path = sys._MEIPASS2
-    except Exception:
-        base_path = os.path.abspath(".")
-    return os.path.join(base_path, relative_path)
-
-class Clase_App_SMS():
-    def __init__(self):
-        self.reporte = None
-        self.inicio = None
-        self.inicio_sap = None
-        self.fin_sap = None
-        self.fin = None
-    
+class App_SMS():    
     def salir(self):
         self.app.destroy()
-
+    
     def deshabilitar_botones(self):
         self.boton1.configure(state="disabled")
         self.boton2.configure(state="disabled")
         self.boton3.configure(state="disabled")
         self.boton4.configure(state="disabled")
         self.boton_salir.configure(state="disabled")
-
+    
     def habilitar_botones(self):
         self.boton1.configure(state="normal")
         self.boton2.configure(state="normal")
         self.boton3.configure(state="normal")
         self.boton4.configure(state="normal")
         self.boton_salir.configure(state="normal")
-
+    
     def verificar_thread(self, thread):
         if thread.is_alive():
             self.app.after(1000, self.verificar_thread, thread)
         else:
             self.habilitar_botones()
-
+    
     def iniciar_proceso(self, accion):
         self.deshabilitar_botones()
         if accion == 1:
@@ -61,7 +48,7 @@ class Clase_App_SMS():
             return        
         thread.start()
         self.app.after(1000, self.verificar_thread, thread)
-
+    
     def accion_boton1(self):
         self.progressbar.start()
         try:
@@ -73,18 +60,17 @@ class Clase_App_SMS():
             messagebox.showerror("ERROR", "Algo salió mal. Por favor, intente nuevamente.\n\nDetalles: " + str(e))
         finally:
             self.progressbar.stop()
-
+    
     def accion_boton2(self):
         self.progressbar.start()
         try:
             self.reporte.exportar_deudores()
-            os.startfile(resource_path("./bases/Deudores.xlsx"))
             self.inicio_sap = time.time()
         except Exception as e:
             messagebox.showerror("ERROR", "Algo salió mal. Por favor, intente nuevamente.\n\nDetalles: " + str(e))
         finally:
             self.progressbar.stop()
-
+    
     def accion_boton3(self):
         self.progressbar.start()
         try:
@@ -96,7 +82,7 @@ class Clase_App_SMS():
             messagebox.showerror("ERROR", "Algo salió mal. Por favor, intente nuevamente.\n\nDetalles: " + str(e))
         finally:
             self.progressbar.stop()
-
+    
     def accion_boton4(self):
         self.progressbar.start()
         try:
@@ -113,7 +99,7 @@ class Clase_App_SMS():
             messagebox.showerror("ERROR", "Algo salió mal. Por favor, intente nuevamente.\nDetalles: " + str(e))
         finally:
             self.progressbar.stop()
-
+    
     def generar_reporte(self):
         try:
             excel_rutas = resource_path("./RUTAS.xlsx")
@@ -131,7 +117,7 @@ class Clase_App_SMS():
             messagebox.showerror("ERROR", "Algo salió mal. Por favor, intente nuevamente.\n\nDetalles: " + str(e)
                                 + "\n\nAsegúrese de tener el archivo 'RUTAS.xlsx' en la misma carpeta que el ejecutable.")
             self.app.destroy()
-
+    
     def crear_app(self):        
         self.app = CTk()
         self.app.title("SMS C&CD")
@@ -188,7 +174,7 @@ class Clase_App_SMS():
         self.app.mainloop()
 
 def main():
-    app = Clase_App_SMS()
+    app = App_SMS()
     app.generar_reporte()
     app.crear_app()
 

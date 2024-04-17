@@ -1,3 +1,4 @@
+from resource_path import *
 import pandas as pd
 import shutil
 
@@ -23,10 +24,13 @@ class Clase_SMS:
         
         self.ld = "./archivos-txt/LD " + self.fecha_hoy_txt + ".txt"
         self.nivel_1 = "./archivos-txt/Nivel 1 " + self.fecha_hoy_txt + ".txt"
-
+    
+    def abrir_archivo(self, path):
+        os.startfile(resource_path(path))
+    
     def traer_archivos(self):
         shutil.copy(self.ruta_modelo, self.modelo)
-
+    
     def preparar_zfir60(self):
         df_zfir60 = pd.read_excel(self.ruta_zfir60, sheet_name="Sheet1")
         df_zfir60 = df_zfir60[["Cliente Pa", "Total Vencida"]]
@@ -34,14 +38,15 @@ class Clase_SMS:
         df_zfir60 = df_zfir60.groupby("Cliente Pa")["Total Vencida"].sum().reset_index()
         df_zfir60.to_excel(self.zfir, sheet_name="BASE", index=False)
         self.df_zfir60 = df_zfir60
-
+    
     def exportar_deudores(self):
         df_recaudacion = pd.read_csv(self.reporte_recaudacion, encoding="latin1")
         df_recaudacion = df_recaudacion.drop("USER_ID", axis=1)
         df_recaudacion = df_recaudacion[df_recaudacion["FECHA_RECAUDACION"] == int(self.fecha_ayer)]
         df_recaudacion[["SAP"]].to_excel(self.deudores, index=False)
+        self.abrir_archivo(self.deudores)
         self.df_recaudacion = df_recaudacion
-
+    
     def preparar_fbl5n(self):
         df_fbl5n = pd.read_excel(self.fbl5n)
         df_fbl5n = df_fbl5n[df_fbl5n["Cuenta"].notna()]
@@ -50,7 +55,7 @@ class Clase_SMS:
         df_fbl5n["Importe en ML"] = df_fbl5n["Importe en ML"] * -1
         df_fbl5n = df_fbl5n.groupby("Cuenta")["Importe en ML"].sum().reset_index()
         self.df_fbl5n = df_fbl5n
-
+    
     def preparar_recaudacion(self):
         self.df_fbl5n.set_index("Cuenta", inplace=True)
         self.df_recaudacion["FALTA"] = self.df_recaudacion["SAP"].map(self.df_fbl5n["Importe en ML"])
@@ -59,6 +64,6 @@ class Clase_SMS:
         self.df_recaudacion["RESTA"] = self.df_recaudacion["LIMITE_CREDITICIO"] - self.df_recaudacion["SALDO_ACTUAL"]
         self.df_recaudacion["TOTAL"] = self.df_recaudacion["FALTA"] + self.df_recaudacion["RESTA"]
         self.df_recaudacion.to_excel(self.recaudacion, sheet_name="BASE", index=False)
-
+    
     def exportar_archivos_txt(self):
         pass

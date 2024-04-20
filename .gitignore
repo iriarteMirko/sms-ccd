@@ -4,9 +4,8 @@
 *.xlsm
 *.docx
 *.csv
-archivos-txt/
-bases/
-modelo-zfir-recaudacion/
+CARGAS/
+BASES/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

@@ -54,7 +54,6 @@ class App_SMS():
         try:
             self.inicio = time.time()
             self.reporte.actualizar_base_celulares()
-            messagebox.showinfo("INFO", "Base de Celulares Actualizada!")
         except Exception as e:
             messagebox.showerror("ERROR", "Algo salió mal. Por favor, intente nuevamente.\n\nDetalles: " + str(e))
         finally:
@@ -91,7 +90,7 @@ class App_SMS():
             tiempo_sap = self.fin_sap - self.inicio_sap
             tiempo_total = self.fin - self.inicio
             tiempo_proceso = tiempo_total - tiempo_sap
-            messagebox.showinfo("INFO", "TIEMPOS DE EJECUCIÓN: \n\n"
+            messagebox.showinfo("INFO", "TIEMPOS DE EJECUCIÓN: \n"
                                 + "\nTiempo Proceso: " + str(round(tiempo_proceso, 2)) + " segundos."
                                 + "\nTiempo SAP: " + str(round(tiempo_sap, 2)) + " segundos."
                                 + "\nTiempo Total: " + str(round(tiempo_total, 2)) + " segundos.")

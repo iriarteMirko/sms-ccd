@@ -8,18 +8,17 @@ class Clase_SMS:
         self.fecha_ayer = fecha_ayer
         self.fecha_hoy_txt = fecha_hoy_txt
         
+        self.ruta_dacxanalista = ruta_dacxanalista + "/Nuevo_DACxANALISTA.xlsx"
         self.ruta_zfir60 = ruta_zfir60 + "/ZFIR60_" + self.fecha_hoy + ".xlsx"
         self.ruta_modelo = ruta_modelo + "/Modelo de Evaluación de Pedidos de Equipos_" + self.fecha_hoy + ".xlsx"
         
-        self.fbl5n = "./bases/FBL5N.xlsx"
-        self.reporte_recaudacion = "./bases/Reporte_Recaudacion_" + self.fecha_hoy + ".csv"
-        self.deudores = "./bases/Deudores.xlsx"
+        self.ruta_base_celulares = "./BASES/Base_Celulares_CCD.xlsx"
+        self.fbl5n = "./BASES/FBL5N.xlsx"
+        self.reporte_recaudacion = "./BASES/Reporte_Recaudacion_" + self.fecha_hoy + ".csv"
+        self.deudores = "./BASES/Deudores.xlsx"
         
-        self.ruta_dacxanalista = ruta_dacxanalista + "/Nuevo_DACxANALISTA.xlsx"
-        self.ruta_base_celulares = "./bases/Base_Celulares_CCD.xlsx"
-        
-        self.ld_txt = "./archivos-txt/LD " + self.fecha_hoy_txt + ".txt"
-        self.nivel_1_txt = "./archivos-txt/Nivel 1 " + self.fecha_hoy_txt + ".txt"
+        self.ld_txt = "./CARGAS/LD " + self.fecha_hoy_txt + ".txt"
+        self.nivel_1_txt = "./CARGAS/Nivel 1 " + self.fecha_hoy_txt + ".txt"
     
     def abrir_archivo(self, path):
         os.startfile(resource_path(path))
@@ -71,9 +70,10 @@ class Clase_SMS:
         if total_deudores == total_celulares:
             messagebox.showinfo("INFO", "Todos los socios["+str(total_deudores)+"] cuentan con celulares.")
         else:
-            messagebox.showwarning("ADVERTENCIA", "Total socios: " + str(total_deudores) 
-                                    + "\nSocios con celular: " + str(total_celulares) 
-                                    + "\nSocios sin celular: " + str(total_deudores-total_celulares))
+            messagebox.showinfo("INFO", "BASE DE CELULARES ACTUALIZADA!\n"
+                                + "\n- Socios con celular: " + str(total_celulares) 
+                                + "\n- Socios sin celular: " + str(total_deudores-total_celulares)
+                                + "\n- Total: " + str(total_deudores))
         self.df_base_celulares = df_base_celulares
     
     def exportar_deudores(self):
@@ -164,10 +164,10 @@ class Clase_SMS:
             lambda row: f'51{row["CELULAR"]},Text,"Estimado Socio: Le informamos que tiene una deuda vencida de S/{row["Total Vencida"]}, puede pagarla desde la Web y App de bancos principales. Mayor informacion en el Portal de Canales: https://portaldistribuidores.claro.com.pe. Creditos y Cobranzas Distribuidores."', axis=1)
         self.df_cruce_zfir60 = df_cruce_zfir60
         
-        messagebox.showinfo("INFO", "Registros validados: " 
+        messagebox.showinfo("INFO", "REGISTROS VALIDADOS:\n" 
                             + "\n- En LD de EQUIPOS: " + str(self.df_cruce_modelo.shape[0])
                             + "\n- En LD de RECAUDACION: " + str(self.df_cruce_recaudacion.shape[0])
-                            + "\n- Con Deuda Vencida: " + str(df_cruce_zfir60.shape[0]))
+                            + "\n- Con Deuda Vencida (ZFIR60): " + str(df_cruce_zfir60.shape[0]))
     
     def exportar_archivos_txt(self):
         # Nivel 1
@@ -182,7 +182,7 @@ class Clase_SMS:
             for item in lista_ld:
                 f.write("%s\n" % item)
         # Mensajes listos
-        messagebox.showinfo("SMS C&CD", "MENSAJES LISTOS!!!" 
-                            + "\n\n- Nivel 1: " + str(len(lista_nivel_1)) + "destinatarios."
-                            + "\n- LD: " + str(len(lista_ld)) + "destinatarios.")
-        os.startfile(resource_path("./archivos-txt/"))
+        messagebox.showinfo("SMS C&CD", "MENSAJES LISTOS!!!\n"
+                            + "\n- LD: " + str(len(lista_ld)) + " destinatarios." 
+                            + "\n- Nivel 1: " + str(len(lista_nivel_1)) + " destinatarios.")
+        os.startfile(resource_path("./CARGAS/"))

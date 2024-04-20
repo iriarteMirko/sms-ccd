@@ -53,9 +53,8 @@ class App_SMS():
         self.progressbar.start()
         try:
             self.inicio = time.time()
-            self.reporte.traer_archivos()
-            self.reporte.preparar_zfir60()
-            messagebox.showinfo("PASO 1", "COMPLETADO")
+            self.reporte.actualizar_base_celulares()
+            messagebox.showinfo("INFO", "Base de Celulares Actualizada!")
         except Exception as e:
             messagebox.showerror("ERROR", "Algo salió mal. Por favor, intente nuevamente.\n\nDetalles: " + str(e))
         finally:
@@ -77,7 +76,8 @@ class App_SMS():
             self.fin_sap = time.time()
             self.reporte.preparar_fbl5n()
             self.reporte.preparar_recaudacion()
-            messagebox.showinfo("PASO 2", "COMPLETADO")
+            self.reporte.preparar_modelo()
+            self.reporte.preparar_zfir60()
         except Exception as e:
             messagebox.showerror("ERROR", "Algo salió mal. Por favor, intente nuevamente.\n\nDetalles: " + str(e))
         finally:
@@ -91,7 +91,7 @@ class App_SMS():
             tiempo_sap = self.fin_sap - self.inicio_sap
             tiempo_total = self.fin - self.inicio
             tiempo_proceso = tiempo_total - tiempo_sap
-            messagebox.showinfo("SMS C&CD", "MENSAJES LISTOS!\n\n"
+            messagebox.showinfo("INFO", "TIEMPOS DE EJECUCIÓN: \n\n"
                                 + "\nTiempo Proceso: " + str(round(tiempo_proceso, 2)) + " segundos."
                                 + "\nTiempo SAP: " + str(round(tiempo_sap, 2)) + " segundos."
                                 + "\nTiempo Total: " + str(round(tiempo_total, 2)) + " segundos.")
@@ -142,7 +142,7 @@ class App_SMS():
         frame_botones = CTkFrame(main_frame)
         frame_botones.grid(row=1, column=0, padx=(20, 20), pady=(20, 0), sticky="nsew")
         
-        self.boton1 = CTkButton(frame_botones, text=">>> PASO 1 <<<", font=("Calibri",17), text_color="black", 
+        self.boton1 = CTkButton(frame_botones, text="ACTUALIZAR CELULARES", font=("Calibri",17), text_color="black", 
                             fg_color="transparent", border_color="black", border_width=3, hover_color="#d11515", 
                             width=25, corner_radius=10, command=lambda: self.iniciar_proceso(1))
         self.boton1.pack(anchor="center", fill="both", expand=True, ipady=10, padx=(20, 20), pady=(20, 0))
@@ -152,12 +152,12 @@ class App_SMS():
                             width=25, corner_radius=10, command=lambda: self.iniciar_proceso(2))
         self.boton2.pack(anchor="center", fill="both", expand=True, ipady=10, padx=(20, 20), pady=(20, 0))
         
-        self.boton3 = CTkButton(frame_botones, text=">>> PASO 2 <<<", font=("Calibri",17), text_color="black", 
+        self.boton3 = CTkButton(frame_botones, text="PREPARAR BASES", font=("Calibri",17), text_color="black", 
                             fg_color="transparent", border_color="black", border_width=3, hover_color="#d11515", 
                             width=25, corner_radius=10, command=lambda: self.iniciar_proceso(3))
         self.boton3.pack(anchor="center", fill="both", expand=True, ipady=10, padx=(20, 20), pady=(20, 0))
         
-        self.boton4 = CTkButton(frame_botones, text="EXPORTAR ARCHIVOS TXT", font=("Calibri",17), text_color="black", 
+        self.boton4 = CTkButton(frame_botones, text="EXPORTAR TXT", font=("Calibri",17), text_color="black", 
                             fg_color="transparent", border_color="black", border_width=3, hover_color="#d11515", 
                             width=25, corner_radius=10, command=lambda: self.iniciar_proceso(4))
         self.boton4.pack(anchor="center", fill="both", expand=True, ipady=10, padx=(20, 20), pady=(20, 20))

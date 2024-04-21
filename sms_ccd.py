@@ -136,38 +136,38 @@ class App_SMS():
         frame_title.grid(row=0, column=0, padx=(20, 20), pady=(20, 0), sticky="nsew")
         
         titulo = CTkLabel(frame_title, text="Mensajes de Texto C&CD", font=("Arial",25,"bold"))
-        titulo.pack(fill="both", expand=True, padx=(20,20), ipady=20, anchor="center")
+        titulo.pack(fill="both", expand=True, padx=(20, 20), ipady=20, anchor="center")
         
         frame_botones = CTkFrame(main_frame)
         frame_botones.grid(row=1, column=0, padx=(20, 20), pady=(20, 0), sticky="nsew")
         
         self.boton1 = CTkButton(frame_botones, text="ACTUALIZAR CELULARES", font=("Calibri",17), text_color="black", 
-                            fg_color="transparent", border_color="black", border_width=3, hover_color="#d11515", 
-                            width=25, corner_radius=10, command=lambda: self.iniciar_proceso(1))
+                                fg_color="transparent", border_color="black", border_width=3, hover_color="#d11515", 
+                                width=25, corner_radius=10, command=lambda: self.iniciar_proceso(1))
         self.boton1.pack(anchor="center", fill="both", expand=True, ipady=10, padx=(20, 20), pady=(20, 0))
         
         self.boton2 = CTkButton(frame_botones, text="EXPORTAR DEUDORES SAP", font=("Calibri",17), text_color="black", 
-                            fg_color="transparent", border_color="black", border_width=3, hover_color="#d11515", 
-                            width=25, corner_radius=10, command=lambda: self.iniciar_proceso(2))
+                                fg_color="transparent", border_color="black", border_width=3, hover_color="#d11515", 
+                                width=25, corner_radius=10, command=lambda: self.iniciar_proceso(2))
         self.boton2.pack(anchor="center", fill="both", expand=True, ipady=10, padx=(20, 20), pady=(20, 0))
         
         self.boton3 = CTkButton(frame_botones, text="PREPARAR BASES", font=("Calibri",17), text_color="black", 
-                            fg_color="transparent", border_color="black", border_width=3, hover_color="#d11515", 
-                            width=25, corner_radius=10, command=lambda: self.iniciar_proceso(3))
+                                fg_color="transparent", border_color="black", border_width=3, hover_color="#d11515", 
+                                width=25, corner_radius=10, command=lambda: self.iniciar_proceso(3))
         self.boton3.pack(anchor="center", fill="both", expand=True, ipady=10, padx=(20, 20), pady=(20, 0))
         
         self.boton4 = CTkButton(frame_botones, text="EXPORTAR TXT", font=("Calibri",17), text_color="black", 
-                            fg_color="transparent", border_color="black", border_width=3, hover_color="#d11515", 
-                            width=25, corner_radius=10, command=lambda: self.iniciar_proceso(4))
+                                fg_color="transparent", border_color="black", border_width=3, hover_color="#d11515", 
+                                width=25, corner_radius=10, command=lambda: self.iniciar_proceso(4))
         self.boton4.pack(anchor="center", fill="both", expand=True, ipady=10, padx=(20, 20), pady=(20, 20))
         
         self.progressbar = CTkProgressBar(main_frame, mode="indeterminate", orientation="horizontal", 
-                                        progress_color="#d11515", height=10, border_width=0)
+                                            progress_color="#d11515", height=10, border_width=0)
         self.progressbar.grid(row=2, column=0, padx=(20, 20), pady=(10, 0), sticky="nsew")
         
         self.boton_salir = CTkButton(main_frame, text="SALIR", font=("Calibri",17), text_color="black", 
-                                fg_color="transparent", border_color="black", border_width=3, hover_color="#d11515", 
-                                width=10, corner_radius=10, command=self.salir)
+                                    fg_color="transparent", border_color="black", border_width=3, hover_color="#d11515", 
+                                    width=10, corner_radius=10, command=self.salir)
         self.boton_salir.grid(row=3, column=0, padx=(150, 150), pady=(20, 20), sticky="nsew")
         
         self.app.mainloop()

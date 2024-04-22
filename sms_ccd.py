@@ -17,6 +17,8 @@ class App_SMS():
     def deshabilitar_botones(self):
         self.boton1.configure(state="disabled")
         self.boton2.configure(state="disabled")
+        self.checkbox_hoja.configure(state="disabled")
+        self.checkbox_fichero.configure(state="disabled")
         self.boton3.configure(state="disabled")
         self.boton4.configure(state="disabled")
         self.boton_salir.configure(state="disabled")
@@ -24,6 +26,8 @@ class App_SMS():
     def habilitar_botones(self):
         self.boton1.configure(state="normal")
         self.boton2.configure(state="normal")
+        self.checkbox_hoja.configure(state="normal")
+        self.checkbox_fichero.configure(state="normal")
         self.boton3.configure(state="normal")
         self.boton4.configure(state="normal")
         self.boton_salir.configure(state="normal")
@@ -163,18 +167,18 @@ class App_SMS():
         self.var_hoja_calculo = BooleanVar()
         self.var_hoja_calculo.set(True)
         self.var_hoja_calculo.trace("w", lambda *args: self.var_fichero_local.set(not self.var_hoja_calculo.get()))
-        checkbox_hoja = CTkCheckBox(frame_checkbox, text="Hoja de cálculo", font=("Calibri",17), 
+        self.checkbox_hoja = CTkCheckBox(frame_checkbox, text="Hoja de cálculo", font=("Calibri",17), 
                                     border_color="#d11515", border_width=2, fg_color="#d11515", 
                                     hover_color="#d11515", variable=self.var_hoja_calculo)
-        checkbox_hoja.pack(side="left", anchor="w", fill="both", expand=True, ipady=10, padx=(20, 10), pady=(0, 10))
+        self.checkbox_hoja.pack(side="left", anchor="w", fill="both", expand=True, ipady=10, padx=(20, 10), pady=(0, 10))
         
         self.var_fichero_local = BooleanVar()
         self.var_fichero_local.set(False)
         self.var_fichero_local.trace("w", lambda *args: self.var_hoja_calculo.set(not self.var_fichero_local.get()))
-        checkbox_fichero = CTkCheckBox(frame_checkbox, text="Fichero local", font=("Calibri",17), 
+        self.checkbox_fichero = CTkCheckBox(frame_checkbox, text="Fichero local", font=("Calibri",17), 
                                     border_color="#d11515", border_width=2, fg_color="#d11515", 
                                     hover_color="#d11515", variable=self.var_fichero_local)
-        checkbox_fichero.pack(side="right", anchor="w", fill="both", expand=True, ipady=10, padx=(10, 20), pady=(0, 10))
+        self.checkbox_fichero.pack(side="right", anchor="w", fill="both", expand=True, ipady=10, padx=(10, 20), pady=(0, 10))
         
         self.boton3 = CTkButton(frame_botones, text="PREPARAR BASES", font=("Calibri",17), text_color="black", 
                                 fg_color="transparent", border_color="black", border_width=3, hover_color="#d11515", 

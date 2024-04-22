@@ -159,6 +159,7 @@ class App_SMS():
         
         self.var_hoja_calculo = BooleanVar()
         self.var_hoja_calculo.set(True)
+        self.var_hoja_calculo.trace("w", lambda *args: self.var_fichero_local.set(not self.var_hoja_calculo.get()))
         checkbox_hoja = CTkCheckBox(frame_checkbox, text="Hoja de cálculo", font=("Calibri",17), 
                                     border_color="#d11515", border_width=2, fg_color="#d11515", 
                                     hover_color="#d11515", variable=self.var_hoja_calculo)
@@ -166,6 +167,7 @@ class App_SMS():
         
         self.var_fichero_local = BooleanVar()
         self.var_fichero_local.set(False)
+        self.var_fichero_local.trace("w", lambda *args: self.var_hoja_calculo.set(not self.var_fichero_local.get()))
         checkbox_fichero = CTkCheckBox(frame_checkbox, text="Fichero local", font=("Calibri",17), 
                                     border_color="#d11515", border_width=2, fg_color="#d11515", 
                                     hover_color="#d11515", variable=self.var_fichero_local)

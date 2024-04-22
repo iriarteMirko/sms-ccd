@@ -151,6 +151,26 @@ class App_SMS():
                                 width=25, corner_radius=10, command=lambda: self.iniciar_proceso(2))
         self.boton2.pack(anchor="center", fill="both", expand=True, ipady=10, padx=(20, 20), pady=(20, 0))
         
+        frame_checkbox = CTkFrame(frame_botones)
+        frame_checkbox.pack(anchor="center", fill="both", expand=True, padx=(20, 20), pady=(20, 0))
+        
+        label_exportar = CTkLabel(frame_checkbox, text="SELECCIONAR FORMATO:", font=("Calibri",17,"bold"))
+        label_exportar.pack(side="top", anchor="w", fill="both", expand=True, ipady=10, padx=(20, 20), pady=(10, 0))
+        
+        self.var_hoja_calculo = BooleanVar()
+        self.var_hoja_calculo.set(True)
+        checkbox_hoja = CTkCheckBox(frame_checkbox, text="Hoja de cálculo", font=("Calibri",17), 
+                                    border_color="#d11515", border_width=2, fg_color="#d11515", 
+                                    hover_color="#d11515", variable=self.var_hoja_calculo)
+        checkbox_hoja.pack(side="left", anchor="w", fill="both", expand=True, ipady=10, padx=(20, 10), pady=(0, 10))
+        
+        self.var_fichero_local = BooleanVar()
+        self.var_fichero_local.set(False)
+        checkbox_fichero = CTkCheckBox(frame_checkbox, text="Fichero local", font=("Calibri",17), 
+                                    border_color="#d11515", border_width=2, fg_color="#d11515", 
+                                    hover_color="#d11515", variable=self.var_fichero_local)
+        checkbox_fichero.pack(side="right", anchor="w", fill="both", expand=True, ipady=10, padx=(10, 20), pady=(0, 10))
+        
         self.boton3 = CTkButton(frame_botones, text="PREPARAR BASES", font=("Calibri",17), text_color="black", 
                                 fg_color="transparent", border_color="black", border_width=3, hover_color="#d11515", 
                                 width=25, corner_radius=10, command=lambda: self.iniciar_proceso(3))

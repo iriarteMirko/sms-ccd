@@ -13,7 +13,8 @@ class Clase_SMS:
         self.ruta_modelo = ruta_modelo + "/Modelo de Evaluación de Pedidos de Equipos_" + self.fecha_hoy + ".xlsx"
         
         self.ruta_base_celulares = "./BASES/Base_Celulares_CCD.xlsx"
-        self.fbl5n = "./BASES/FBL5N.xlsx"
+        self.fbl5n_hoja = "./BASES/FBL5N_HOJA.xlsx"
+        self.fbl5n_fichero = "./BASES/FBL5N_FICHERO.xlsx"
         self.reporte_recaudacion = "./BASES/Reporte_Recaudacion_" + self.fecha_hoy + ".csv"
         self.deudores = "./BASES/Deudores.xlsx"
         
@@ -85,10 +86,27 @@ class Clase_SMS:
         self.df_recaudacion = df_recaudacion
         self.abrir_archivo(self.deudores)
     
-    def preparar_fbl5n(self):
-        df_fbl5n = pd.read_excel(self.fbl5n)
+    def preparar_fbl5n_hoja_calculo(self):
+        df_fbl5n = pd.read_excel(self.fbl5n_hoja)
         df_fbl5n = df_fbl5n[df_fbl5n["Cuenta"].notna()]
         df_fbl5n = df_fbl5n[df_fbl5n["ACC"] == "PE07"]
+        df_fbl5n = df_fbl5n[["Cuenta","Importe en ML"]]
+        df_fbl5n["Importe en ML"] = df_fbl5n["Importe en ML"] * -1
+        df_fbl5n = df_fbl5n.groupby("Cuenta")["Importe en ML"].sum().reset_index()
+        df_fbl5n.set_index("Cuenta", inplace=True)
+        self.df_fbl5n = df_fbl5n
+    
+    def preparar_fbl5n_fichero_local(self):
+        df_fbl5n = pd.read_excel(self.fbl5n_fichero)
+        df_fbl5n = df_fbl5n.iloc[:, 3:] # Elimina las 3 primeras columnas
+        df_fbl5n = df_fbl5n.iloc[7:, :] # Elimina las 7 primeras filas
+        df_fbl5n = df_fbl5n.drop(df_fbl5n.index[1]) # Elimina la segunda fila (después de eliminar las 7 primeras)
+        df_fbl5n = df_fbl5n.iloc[:-3, :] # Elimina las 3 últimas filas
+        df_fbl5n.columns = df_fbl5n.iloc[0] # Nuevo encabezado
+        df_fbl5n = df_fbl5n[1:]
+        df_fbl5n = df_fbl5n[df_fbl5n["Cuenta"].notna()]
+        df_fbl5n = df_fbl5n[df_fbl5n["ACC"] == "PE07"]
+        df_fbl5n = df_fbl5n.rename(columns={"     Importe en ML":"Importe en ML"})
         df_fbl5n = df_fbl5n[["Cuenta","Importe en ML"]]
         df_fbl5n["Importe en ML"] = df_fbl5n["Importe en ML"] * -1
         df_fbl5n = df_fbl5n.groupby("Cuenta")["Importe en ML"].sum().reset_index()

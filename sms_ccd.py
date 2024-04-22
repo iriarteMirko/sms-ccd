@@ -73,7 +73,10 @@ class App_SMS():
         self.progressbar.start()
         try:
             self.fin_sap = time.time()
-            self.reporte.preparar_fbl5n()
+            if self.var_hoja_calculo.get() == True:
+                self.reporte.preparar_fbl5n_hoja_calculo()
+            else:
+                self.reporte.preparar_fbl5n_fichero_local()
             self.reporte.preparar_recaudacion()
             self.reporte.preparar_modelo()
             self.reporte.preparar_zfir60()

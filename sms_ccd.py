@@ -56,27 +56,33 @@ class App_SMS():
     def accion_boton1(self):
         self.progressbar.start()
         try:
-            self.inicio = time.time()
+            inicio = time.time()
             self.reporte.actualizar_base_celulares()
         except Exception as e:
             messagebox.showerror("ERROR", "Algo salió mal. Por favor, intente nuevamente.\n\nDetalles: " + str(e))
         finally:
+            fin = time.time()
+            self.proceso1 = fin - inicio
             self.progressbar.stop()
     
     def accion_boton2(self):
         self.progressbar.start()
         try:
+            inicio = time.time()
             self.reporte.exportar_deudores()
-            self.inicio_sap = time.time()
         except Exception as e:
             messagebox.showerror("ERROR", "Algo salió mal. Por favor, intente nuevamente.\n\nDetalles: " + str(e))
         finally:
+            fin = time.time()
+            self.proceso2 = fin - inicio
             self.progressbar.stop()
+            self.inicio_sap = time.time()
     
     def accion_boton3(self):
+        self.fin_sap = time.time()
         self.progressbar.start()
         try:
-            self.fin_sap = time.time()
+            inicio = time.time()
             if self.var_hoja_calculo.get() == True:
                 self.reporte.preparar_fbl5n_hoja_calculo()
             else:
@@ -87,24 +93,28 @@ class App_SMS():
         except Exception as e:
             messagebox.showerror("ERROR", "Algo salió mal. Por favor, intente nuevamente.\n\nDetalles: " + str(e))
         finally:
+            fin = time.time()
+            self.proceso3 = fin - inicio
             self.progressbar.stop()
     
     def accion_boton4(self):
         self.progressbar.start()
         try:
+            inicio = time.time()
             self.reporte.exportar_archivos_txt()
-            self.fin = time.time()
+        except Exception as e:
+            messagebox.showerror("ERROR", "Algo salió mal. Por favor, intente nuevamente.\nDetalles: " + str(e))
+        finally:
+            fin = time.time()
+            proceso4 = fin - inicio
+            self.progressbar.stop()
+            tiempo_proceso = self.proceso1 + self.proceso2 + self.proceso3 + proceso4
             tiempo_sap = self.fin_sap - self.inicio_sap
-            tiempo_total = self.fin - self.inicio
-            tiempo_proceso = tiempo_total - tiempo_sap
+            tiempo_total = tiempo_proceso + tiempo_sap
             messagebox.showinfo("INFO", "TIEMPOS DE EJECUCIÓN: \n"
                                 + "\nTiempo Proceso: " + str(round(tiempo_proceso, 2)) + " segundos."
                                 + "\nTiempo SAP: " + str(round(tiempo_sap, 2)) + " segundos."
                                 + "\nTiempo Total: " + str(round(tiempo_total, 2)) + " segundos.")
-        except Exception as e:
-            messagebox.showerror("ERROR", "Algo salió mal. Por favor, intente nuevamente.\nDetalles: " + str(e))
-        finally:
-            self.progressbar.stop()
     
     def generar_reporte(self):
         try:

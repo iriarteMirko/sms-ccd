@@ -73,7 +73,7 @@ class Clase_SMS:
                                 + "\n- CON CELULAR: " + str(total_celulares) 
                                 + "\n- SIN CELULAR: " + str(total_deudores-total_celulares)
                                 + "\n- TOTAL: " + str(total_deudores))
-        self.df_base_celulares = df_base_celulares
+        self.df_celulares = df_celulares
     
     def exportar_deudores(self):
         df_recaudacion = pd.read_csv(self.reporte_recaudacion, encoding="latin1")
@@ -117,7 +117,7 @@ class Clase_SMS:
         self.df_recaudacion["RESTA"] = self.df_recaudacion["LIMITE_CREDITICIO"] - self.df_recaudacion["SALDO_ACTUAL"]
         self.df_recaudacion["TOTAL"] = self.df_recaudacion["FALTA"] + self.df_recaudacion["RESTA"]
         
-        df_cruce_recaudacion = self.df_base_celulares.merge(self.df_recaudacion, left_on="DEUDOR", right_on="SAP", how="left")
+        df_cruce_recaudacion = self.df_celulares.merge(self.df_recaudacion, left_on="DEUDOR", right_on="SAP", how="left")
         df_cruce_recaudacion = df_cruce_recaudacion[["CELULAR", "NOMBRE", "TOTAL"]]
         df_cruce_recaudacion["TOTAL"].fillna(0, inplace=True)
         df_cruce_recaudacion = df_cruce_recaudacion.sort_values(by="TOTAL", ascending=True)
@@ -143,7 +143,7 @@ class Clase_SMS:
         columnas_modelo = ["DEUDOR", "NOMBRE", "LINEA DISPONIBLE EQUIPOS RESTANTE"]
         df_modelo = df_modelo[columnas_modelo]
         
-        df_cruce_modelo = self.df_base_celulares.merge(df_modelo, left_on="DEUDOR", right_on="DEUDOR", how="inner")
+        df_cruce_modelo = self.df_celulares.merge(df_modelo, left_on="DEUDOR", right_on="DEUDOR", how="inner")
         df_cruce_modelo = df_cruce_modelo[["CELULAR", "NOMBRE_x", "LINEA DISPONIBLE EQUIPOS RESTANTE"]]
         df_cruce_modelo = df_cruce_modelo.rename(columns={"NOMBRE_x": "NOMBRE", "LINEA DISPONIBLE EQUIPOS RESTANTE": "TOTAL"})
         df_cruce_modelo = df_cruce_modelo.sort_values(by="TOTAL", ascending=True)
@@ -170,7 +170,7 @@ class Clase_SMS:
         df_zfir60["Total Vencida"] = df_zfir60["Total Vencida"].clip(lower=0)
         df_zfir60 = df_zfir60.groupby("Cliente Pa")["Total Vencida"].sum().reset_index()
         
-        df_cruce_zfir60 = self.df_base_celulares.merge(df_zfir60, left_on="DEUDOR", right_on="Cliente Pa", how="left")
+        df_cruce_zfir60 = self.df_celulares.merge(df_zfir60, left_on="DEUDOR", right_on="Cliente Pa", how="left")
         df_cruce_zfir60 = df_cruce_zfir60[["CELULAR", "Total Vencida"]]
         df_cruce_zfir60 = df_cruce_zfir60[df_cruce_zfir60["Total Vencida"] != 0]
         df_cruce_zfir60["Total Vencida"] = df_cruce_zfir60["Total Vencida"].apply(

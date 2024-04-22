@@ -27,54 +27,52 @@ class Clase_SMS:
     def actualizar_base_celulares(self):
         df_base_celulares = pd.read_excel(self.ruta_base_celulares)
         df_dacxanalista = pd.read_excel(self.ruta_dacxanalista, sheet_name="Base_NUEVA")
-        df_base_celulares = df_base_celulares.merge(df_dacxanalista, on="DEUDOR", how="right")
-        columnas_requeridas = ["DEUDOR", "NOMBRE", "REGION", "ANALISTA_ACT", "TIPO_DAC", "ESTADO", "CELULAR"]
-        df_base_celulares = df_base_celulares.rename(columns={
-            "NOMBRE_y": "NOMBRE",
-            "REGION_y": "REGION",
-            "ANALISTA_ACT_y": "ANALISTA_ACT",
-            "TIPO_DAC_y": "TIPO_DAC",
-            "ESTADO_y": "ESTADO"
+        columnas_requeridas = ["DEUDOR", "NOMBRE", "REGION", "ANALISTA_ACT", "TIPO_DAC", "ESTADO"]
+        lista_tipo_dac_no_validos = ["PVA", "TARJETERO", "RED", "RECARGA FFVV", "PROVEEDOR", "CROSSBORDER", "CDR", "CACE", "AGENTE TELMEX", "AGENTE TELMEX  / RED", "DAC RURAL"]
+        df_dacxanalista = df_dacxanalista[columnas_requeridas]
+        df_dacxanalista = df_dacxanalista[~df_dacxanalista["TIPO_DAC"].isin(lista_tipo_dac_no_validos)]
+        df_dacxanalista = df_dacxanalista[df_dacxanalista["ESTADO"].isin(["OPERATIVO CON MOVIMIENTO", "OPERATIVO SIN MOVIMIENTO"])]
+        df_dacxanalista = df_dacxanalista.merge(df_base_celulares, on="DEUDOR", how="right")
+        df_dacxanalista = df_dacxanalista.rename(columns={
+            "NOMBRE_x": "NOMBRE",
+            "REGION_x": "REGION",
+            "ANALISTA_ACT_x": "ANALISTA_ACT",
+            "TIPO_DAC_x": "TIPO_DAC",
+            "ESTADO_x": "ESTADO"
         })
-        df_base_celulares = df_base_celulares[columnas_requeridas]
-        estados = ["OPERATIVO CON MOVIMIENTO", "OPERATIVO SIN MOVIMIENTO"]
-        lista_tipo_dac_no_validos = ["PVA", "TARJETERO", "RED", "RECARGA FFVV", "PROVEEDOR", 
-                                    "CROSSBORDER", "CDR", "CACE", "AGENTE TELMEX", 
-                                    "AGENTE TELMEX  / RED", "DAC RURAL"]
-        df_base_celulares = df_base_celulares[df_base_celulares["ESTADO"].isin(estados)]
-        df_base_celulares = df_base_celulares[~df_base_celulares["TIPO_DAC"].isin(lista_tipo_dac_no_validos)]
-        df_base_celulares["CELULAR"] = df_base_celulares["CELULAR"].astype("Int64")
-        df_base_celulares["CELULAR"].fillna(0, inplace=True)
-        df_base_celulares.reset_index(drop=True, inplace=True)
-        df_base_celulares.to_excel(self.ruta_base_celulares, index=False)
+        df_dacxanalista = df_dacxanalista[columnas_requeridas + ["CELULAR"]]
+        df_dacxanalista["CELULAR"] = df_dacxanalista["CELULAR"].astype("Int64")
+        df_dacxanalista["CELULAR"] = df_dacxanalista["CELULAR"].fillna(0)
+        df_dacxanalista.reset_index(drop=True, inplace=True)
+        df_dacxanalista.to_excel(self.ruta_base_celulares, index=False)
         # Preparar base celulares
-        total_deudores = df_base_celulares.shape[0]
-        df_base_celulares = df_base_celulares[["DEUDOR", "NOMBRE", "CELULAR"]]
-        df_base_celulares = df_base_celulares[df_base_celulares["CELULAR"]!=0]
-        df_base_celulares.reset_index(drop=True, inplace=True)
-        total_celulares = df_base_celulares.shape[0]
+        df_celulares = df_dacxanalista[["DEUDOR", "NOMBRE", "CELULAR"]]
+        total_deudores = df_celulares.shape[0]
+        df_celulares = df_celulares[df_celulares["CELULAR"]!=0]
+        df_celulares.reset_index(drop=True, inplace=True)
+        total_celulares = df_celulares.shape[0]
         # Limpiar nombres
-        df_base_celulares["NOMBRE"] = df_base_celulares["NOMBRE"].str.replace("á", "a")
-        df_base_celulares["NOMBRE"] = df_base_celulares["NOMBRE"].str.replace("é", "e")
-        df_base_celulares["NOMBRE"] = df_base_celulares["NOMBRE"].str.replace("í", "i")
-        df_base_celulares["NOMBRE"] = df_base_celulares["NOMBRE"].str.replace("ó", "o")
-        df_base_celulares["NOMBRE"] = df_base_celulares["NOMBRE"].str.replace("ú", "u")
-        df_base_celulares["NOMBRE"] = df_base_celulares["NOMBRE"].str.replace("ñ", "n")
-        df_base_celulares["NOMBRE"] = df_base_celulares["NOMBRE"].str.replace("Á", "A")
-        df_base_celulares["NOMBRE"] = df_base_celulares["NOMBRE"].str.replace("É", "E")
-        df_base_celulares["NOMBRE"] = df_base_celulares["NOMBRE"].str.replace("Í", "I")
-        df_base_celulares["NOMBRE"] = df_base_celulares["NOMBRE"].str.replace("Ó", "O")
-        df_base_celulares["NOMBRE"] = df_base_celulares["NOMBRE"].str.replace("Ú", "U")
-        df_base_celulares["NOMBRE"] = df_base_celulares["NOMBRE"].str.replace("Ñ", "N")
-        df_base_celulares["NOMBRE"] = df_base_celulares["NOMBRE"].str.replace("  ", " ")
-        df_base_celulares["NOMBRE"] = df_base_celulares["NOMBRE"].str.replace("  ", " ")
+        df_celulares["NOMBRE"] = df_celulares["NOMBRE"].str.replace("á", "a")
+        df_celulares["NOMBRE"] = df_celulares["NOMBRE"].str.replace("é", "e")
+        df_celulares["NOMBRE"] = df_celulares["NOMBRE"].str.replace("í", "i")
+        df_celulares["NOMBRE"] = df_celulares["NOMBRE"].str.replace("ó", "o")
+        df_celulares["NOMBRE"] = df_celulares["NOMBRE"].str.replace("ú", "u")
+        df_celulares["NOMBRE"] = df_celulares["NOMBRE"].str.replace("ñ", "n")
+        df_celulares["NOMBRE"] = df_celulares["NOMBRE"].str.replace("Á", "A")
+        df_celulares["NOMBRE"] = df_celulares["NOMBRE"].str.replace("É", "E")
+        df_celulares["NOMBRE"] = df_celulares["NOMBRE"].str.replace("Í", "I")
+        df_celulares["NOMBRE"] = df_celulares["NOMBRE"].str.replace("Ó", "O")
+        df_celulares["NOMBRE"] = df_celulares["NOMBRE"].str.replace("Ú", "U")
+        df_celulares["NOMBRE"] = df_celulares["NOMBRE"].str.replace("Ñ", "N")
+        df_celulares["NOMBRE"] = df_celulares["NOMBRE"].str.replace("  ", " ")
+        df_celulares["NOMBRE"] = df_celulares["NOMBRE"].str.replace("  ", " ")
         if total_deudores == total_celulares:
             messagebox.showinfo("INFO", "Todos los socios["+str(total_deudores)+"] cuentan con celulares.")
         else:
             messagebox.showinfo("INFO", "BASE DE CELULARES ACTUALIZADA!\n"
-                                + "\n- Socios con celular: " + str(total_celulares) 
-                                + "\n- Socios sin celular: " + str(total_deudores-total_celulares)
-                                + "\n- Total: " + str(total_deudores))
+                                + "\n- CON CELULAR: " + str(total_celulares) 
+                                + "\n- SIN CELULAR: " + str(total_deudores-total_celulares)
+                                + "\n- TOTAL: " + str(total_deudores))
         self.df_base_celulares = df_base_celulares
     
     def exportar_deudores(self):

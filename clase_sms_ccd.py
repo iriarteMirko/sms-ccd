@@ -20,6 +20,8 @@ class Clase_SMS:
         
         self.ld_txt = "./CARGAS/LD " + self.fecha_hoy_txt + ".txt"
         self.nivel_1_txt = "./CARGAS/Nivel 1 " + self.fecha_hoy_txt + ".txt"
+        
+        self.contador = 0
     
     def abrir_archivo(self, path):
         os.startfile(resource_path(path))
@@ -75,6 +77,24 @@ class Clase_SMS:
                                 + "\n- TOTAL: " + str(total_deudores))
         self.df_celulares = df_celulares
     
+    def generar_texto(self, row):
+        if self.contador == 0:
+            if row["TIPO"] == "DISPONIBLE":
+                return f'51{row["CELULAR"]},Text,"Estimado Socio {row["NOMBRE"]}, le informamos que su Linea Disponible en RECAUDACION es S/{row["TOTAL"]}, puede realizar su pedido hasta este importe. Creditos y Cobranzas le desea un excelente dia."'
+            elif row["TIPO"] == "SOBREGIRO":
+                return f'51{row["CELULAR"]},Text,"Estimado Socio {row["NOMBRE"]}, le informamos que el dia de hoy cuenta con sobregiro en RECAUDACION de S/{row["TOTAL"]}. Para mayor informacion contacte a su analista de C&CD."'
+            elif row["TIPO"] == "SIN_LINEA":
+                return f'51{row["CELULAR"]},Text,"Estimado Socio {row["NOMBRE"]}, le informamos que el día de hoy no cuenta con Linea Disponible en RECAUDACION. Para mayor informacion contacte a su analista de C&CD."'
+        elif self.contador == 1:
+            if row["TIPO"] == "DISPONIBLE":
+                return f'51{row["CELULAR"]},Text,"Estimado Socio {row["NOMBRE"]}, le informamos que su Linea Disponible de Equipos de hoy es S/{row["TOTAL"]}, puede realizar pedidos de equipos valorizados a precio prepago hasta este importe, sujeto a evaluacion crediticia. Creditos y Cobranzas le desea un excelente dia."'
+            elif row["TIPO"] == "SOBREGIRO":
+                return f'51{row["CELULAR"]},Text,"Estimado Socio {row["NOMBRE"]}, le informamos que el dia de hoy cuenta con sobregiro en Linea Disponible para compra de Equipos de S/{row["TOTAL"]}. Para mas informacion contacte a su analista. Creditos y Cobranzas le desea un excelente dia."'
+            elif row["TIPO"] == "SIN_LINEA":
+                return f'51{row["CELULAR"]},Text,"Estimado Socio {row["NOMBRE"]}, le informamos que el dia de hoy no cuenta con Linea Disponible para compra de Equipos. Para mas informacion contacte a su analista. Creditos y Cobranzas le desea un excelente dia."'
+        else:
+            return f'51{row["CELULAR"]},Text,"Estimado Socio: Le informamos que tiene una deuda vencida de S/{row["Total Vencida"]}, puede pagarla desde la Web y App de bancos principales. Mayor informacion en el Portal de Canales: https://portaldistribuidores.claro.com.pe. Creditos y Cobranzas Distribuidores."'
+    
     def exportar_deudores(self):
         df_recaudacion = pd.read_csv(self.reporte_recaudacion, encoding="latin1")
         df_recaudacion = df_recaudacion.drop("USER_ID", axis=1)
@@ -127,16 +147,9 @@ class Clase_SMS:
             lambda x: "{:,.2f}".format(x).replace(",", "x").replace(".", ",").replace("x", "."))
         df_cruce_recaudacion.reset_index(drop=True, inplace=True)
         
-        def generar_texto_recaudacion(row):
-            if row["TIPO"] == "DISPONIBLE":
-                return f'51{row["CELULAR"]},Text,"Estimado Socio {row["NOMBRE"]}, le informamos que su Linea Disponible en RECAUDACION es S/{row["TOTAL"]}, puede realizar su pedido hasta este importe. Creditos y Cobranzas le desea un excelente dia."'
-            elif row["TIPO"] == "SOBREGIRO":
-                return f'51{row["CELULAR"]},Text,"Estimado Socio {row["NOMBRE"]}, le informamos que el dia de hoy cuenta con sobregiro en RECAUDACION de S/{row["TOTAL"]}. Para mayor informacion contacte a su analista de C&CD."'
-            elif row["TIPO"] == "SIN_LINEA":
-                return f'51{row["CELULAR"]},Text,"Estimado Socio {row["NOMBRE"]}, le informamos que el día de hoy no cuenta con Linea Disponible en RECAUDACION. Para mayor informacion contacte a su analista de C&CD."'
-        
-        df_cruce_recaudacion["TEXTO"] = df_cruce_recaudacion.apply(generar_texto_recaudacion, axis=1)
+        df_cruce_recaudacion["TEXTO"] = df_cruce_recaudacion.apply(self.generar_texto, axis=1)
         self.df_cruce_recaudacion = df_cruce_recaudacion
+        self.contador += 1
     
     def preparar_modelo(self):
         df_modelo = pd.read_excel(self.ruta_modelo, sheet_name="Base")
@@ -153,16 +166,9 @@ class Clase_SMS:
             lambda x: "{:,.2f}".format(x).replace(",", "x").replace(".", ",").replace("x", "."))
         df_cruce_modelo.reset_index(drop=True, inplace=True)
         
-        def generar_texto_modelo(row):
-            if row["TIPO"] == "DISPONIBLE":
-                return f'51{row["CELULAR"]},Text,"Estimado Socio {row["NOMBRE"]}, le informamos que su Linea Disponible de Equipos de hoy es S/{row["TOTAL"]}, puede realizar pedidos de equipos valorizados a precio prepago hasta este importe, sujeto a evaluacion crediticia. Creditos y Cobranzas le desea un excelente dia."'
-            elif row["TIPO"] == "SOBREGIRO":
-                return f'51{row["CELULAR"]},Text,"Estimado Socio {row["NOMBRE"]}, le informamos que el dia de hoy cuenta con sobregiro en Linea Disponible para compra de Equipos de S/{row["TOTAL"]}. Para mas informacion contacte a su analista. Creditos y Cobranzas le desea un excelente dia."'
-            elif row["TIPO"] == "SIN_LINEA":
-                return f'51{row["CELULAR"]},Text,"Estimado Socio {row["NOMBRE"]}, le informamos que el dia de hoy no cuenta con Linea Disponible para compra de Equipos. Para mas informacion contacte a su analista. Creditos y Cobranzas le desea un excelente dia."'
-        
-        df_cruce_modelo["TEXTO"] = df_cruce_modelo.apply(generar_texto_modelo, axis=1)
+        df_cruce_modelo["TEXTO"] = df_cruce_modelo.apply(self.generar_texto, axis=1)
         self.df_cruce_modelo = df_cruce_modelo
+        self.contador += 1
     
     def preparar_zfir60(self):
         df_zfir60 = pd.read_excel(self.ruta_zfir60, sheet_name="Sheet1")
@@ -176,8 +182,8 @@ class Clase_SMS:
         df_cruce_zfir60["Total Vencida"] = df_cruce_zfir60["Total Vencida"].apply(
             lambda x: "{:,.2f}".format(x).replace(",", "x").replace(".", ",").replace("x", "."))
         df_cruce_zfir60.reset_index(drop=True, inplace=True)
-        df_cruce_zfir60["TEXTO"] = df_cruce_zfir60.apply(
-            lambda row: f'51{row["CELULAR"]},Text,"Estimado Socio: Le informamos que tiene una deuda vencida de S/{row["Total Vencida"]}, puede pagarla desde la Web y App de bancos principales. Mayor informacion en el Portal de Canales: https://portaldistribuidores.claro.com.pe. Creditos y Cobranzas Distribuidores."', axis=1)
+        
+        df_cruce_zfir60["TEXTO"] = df_cruce_zfir60.apply(self.generar_texto, axis=1)
         self.df_cruce_zfir60 = df_cruce_zfir60
         
         messagebox.showinfo("INFO", "REGISTROS VALIDADOS:\n" 

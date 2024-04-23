@@ -179,6 +179,7 @@ class Clase_SMS:
         df_cruce_zfir60 = self.df_celulares.merge(df_zfir60, left_on="DEUDOR", right_on="Cliente Pa", how="left")
         df_cruce_zfir60 = df_cruce_zfir60[["CELULAR", "Total Vencida"]]
         df_cruce_zfir60 = df_cruce_zfir60[df_cruce_zfir60["Total Vencida"] != 0]
+        df_cruce_zfir60 = df_cruce_zfir60.sort_values(by="Total Vencida", ascending=False)
         df_cruce_zfir60["Total Vencida"] = df_cruce_zfir60["Total Vencida"].apply(
             lambda x: "{:,.2f}".format(x).replace(",", "x").replace(".", ",").replace("x", "."))
         df_cruce_zfir60.reset_index(drop=True, inplace=True)

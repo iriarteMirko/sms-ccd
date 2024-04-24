@@ -187,6 +187,7 @@ class Clase_SMS:
         
         df_cruce_zfir60["TEXTO"] = df_cruce_zfir60.apply(self.generar_texto, axis=1)
         self.df_cruce_zfir60 = df_cruce_zfir60
+        self.contador = 0
         
         messagebox.showinfo("INFO", "REGISTROS VALIDADOS:\n" 
                             + "\n- En LD de EQUIPOS: " + str(self.df_cruce_modelo.shape[0])

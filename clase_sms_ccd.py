@@ -44,6 +44,7 @@ class Clase_SMS:
         })
         df_dacxanalista = df_dacxanalista[columnas_requeridas + ["CELULAR"]]
         df_dacxanalista["CELULAR"] = df_dacxanalista["CELULAR"].astype("Int64")
+        df_dacxanalista.dropna(subset=["NOMBRE"], inplace=True)
         df_dacxanalista["CELULAR"] = df_dacxanalista["CELULAR"].fillna(0)
         df_dacxanalista.reset_index(drop=True, inplace=True)
         df_dacxanalista.to_excel(self.ruta_base_celulares, index=False)

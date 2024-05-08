@@ -101,20 +101,43 @@ class App_SMS():
         self.progressbar.start()
         try:
             inicio = time.time()
-            self.reporte.exportar_archivos_txt()
+            lista_nivel_1, lista_ld = self.reporte.exportar_archivos_txt()
         except Exception as e:
             messagebox.showerror("ERROR", "Algo salió mal. Por favor, intente nuevamente.\nDetalles: " + str(e))
         finally:
             fin = time.time()
             proceso4 = fin - inicio
             self.progressbar.stop()
-            tiempo_proceso = self.proceso1 + self.proceso2 + self.proceso3 + proceso4
-            tiempo_sap = self.fin_sap - self.inicio_sap
-            tiempo_total = tiempo_proceso + tiempo_sap
-            messagebox.showinfo("INFO", "TIEMPOS DE EJECUCIÓN: \n"
-                                + "\nTiempo Proceso: " + str(round(tiempo_proceso, 2)) + " segundos."
-                                + "\nTiempo SAP: " + str(round(tiempo_sap, 2)) + " segundos."
-                                + "\nTiempo Total: " + str(round(tiempo_total, 2)) + " segundos.")
+            self.tiempo_proceso = round((self.proceso1 + self.proceso2 + self.proceso3 + proceso4),2)
+            tiempo_sap = round((self.fin_sap - self.inicio_sap),2)
+            self.tiempo_total = round((self.tiempo_proceso + tiempo_sap),2)
+            
+            self.entry_nivel1.configure(state="normal")
+            self.entry_nivel1.delete(0, "end")
+            self.entry_nivel1.insert(0, lista_nivel_1)
+            self.entry_nivel1.configure(state="readonly")
+            self.entry_ld.configure(state="normal")
+            self.entry_ld.delete(0, "end")
+            self.entry_ld.insert(0, lista_ld)
+            self.entry_ld.configure(state="readonly")
+            
+            self.entry_proceso.configure(state="normal")
+            self.entry_proceso.delete(0, "end")
+            self.entry_proceso.insert(0, str(self.tiempo_proceso) + " s")
+            self.entry_proceso.configure(state="readonly")
+            self.entry_total.configure(state="normal")
+            self.entry_total.delete(0, "end")
+            self.entry_total.insert(0, str(self.tiempo_total) + " s")
+            self.entry_total.configure(state="readonly")
+            # Mensajes listos
+            messagebox.showinfo("SMS C&CD", "MENSAJES LISTOS:"
+                                + "\n- LD: " + lista_ld + " destinatarios." 
+                                + "\n- Nivel 1: " + lista_nivel_1 + " destinatarios."
+                                + "\n\nTIEMPOS DE EJECUCIÓN:"
+                                + "\n- Proceso: " + str(self.tiempo_proceso) + " segundos."
+                                + "\n- SAP: " + str(tiempo_sap) + " segundos."
+                                + "\n- Total: " + str(self.tiempo_total) + " segundos.")
+            os.startfile(resource_path("./CARGAS/"))
     
     def generar_reporte(self):
         try:
@@ -136,78 +159,116 @@ class App_SMS():
     
     def crear_app(self):        
         self.app = CTk()
-        self.app.title("SMS C&CD")
+        self.app.title("SMS CCD")
         icon_path = resource_path("./images/icono.ico")
         if os.path.isfile(icon_path):
             self.app.iconbitmap(icon_path)
         else:
             messagebox.showwarning("ADVERTENCIA", "No se encontró el archivo 'icono.ico' en la ruta: " + icon_path)
-        self.app.resizable(False, False)
+        #self.app.resizable(False, False)
         set_appearance_mode("light")
         
         main_frame = CTkFrame(self.app)
-        main_frame.pack_propagate(0)
+        main_frame.pack_propagate("True")
         main_frame.pack(fill="both", expand=True)
         
         frame_title = CTkFrame(main_frame)
-        frame_title.grid(row=0, column=0, padx=(20, 20), pady=(20, 0), sticky="nsew")
+        frame_title.pack(fill="both", expand=True, padx=10, pady=(10, 0))
         
-        titulo = CTkLabel(frame_title, text="Mensajes de Texto C&CD", font=("Arial",25,"bold"))
-        titulo.pack(fill="both", expand=True, padx=(20, 20), ipady=20, anchor="center")
+        titulo = CTkLabel(frame_title, text="SMS C&CD", font=("Calibri",15,"bold"))
+        titulo.pack(fill="both", expand=True, ipady=5, padx=10)
         
         frame_botones = CTkFrame(main_frame)
-        frame_botones.grid(row=1, column=0, padx=(20, 20), pady=(20, 0), sticky="nsew")
+        frame_botones.pack(fill="both", expand=True, padx=10, pady=(10, 0))
         
-        self.boton1 = CTkButton(frame_botones, text="ACTUALIZAR CELULARES", font=("Calibri",17), text_color="black", 
-                                fg_color="transparent", border_color="black", border_width=3, hover_color="#d11515", 
-                                width=25, corner_radius=10, command=lambda: self.iniciar_proceso(1))
-        self.boton1.pack(anchor="center", fill="both", expand=True, ipady=10, padx=(20, 20), pady=(20, 0))
+        self.boton1 = CTkButton(frame_botones, text="Actualizar Números", font=("Calibri",12), text_color="black", 
+                                fg_color="transparent", border_color="black", border_width=2, hover_color="#d11515", 
+                                width=200, corner_radius=5, command=lambda: self.iniciar_proceso(1))
+        self.boton1.pack(fill="both", expand=True, ipady=5, padx=10, pady=(10, 0))
         
-        self.boton2 = CTkButton(frame_botones, text="EXPORTAR DEUDORES SAP", font=("Calibri",17), text_color="black", 
-                                fg_color="transparent", border_color="black", border_width=3, hover_color="#d11515", 
-                                width=25, corner_radius=10, command=lambda: self.iniciar_proceso(2))
-        self.boton2.pack(anchor="center", fill="both", expand=True, ipady=10, padx=(20, 20), pady=(20, 0))
+        self.boton2 = CTkButton(frame_botones, text="Exportar Deudores", font=("Calibri",12), text_color="black", 
+                                fg_color="transparent", border_color="black", border_width=2, hover_color="#d11515", 
+                                width=200, corner_radius=5, command=lambda: self.iniciar_proceso(2))
+        self.boton2.pack(fill="both", expand=True, ipady=5, padx=10, pady=(10, 0))
         
-        frame_checkbox = CTkFrame(frame_botones)
-        frame_checkbox.pack(anchor="center", fill="both", expand=True, padx=(20, 20), pady=(20, 0))
+        frame_checkbox = CTkFrame(frame_botones, border_width=2, border_color="black")
+        frame_checkbox.pack(fill="both", expand=True, padx=10, pady=(10, 0))
         
-        label_exportar = CTkLabel(frame_checkbox, text="SELECCIONAR FORMATO:", font=("Calibri",17,"bold"))
-        label_exportar.pack(side="top", anchor="w", fill="both", expand=True, ipady=10, padx=(20, 20), pady=(10, 0))
+        label_exportar = CTkLabel(frame_checkbox, text="Seleccionar formato SAP:", font=("Calibri",12,"bold"))
+        label_exportar.pack(padx=10, pady=5)
         
         self.var_hoja_calculo = BooleanVar()
         self.var_hoja_calculo.set(True)
         self.var_hoja_calculo.trace("w", lambda *args: self.var_fichero_local.set(not self.var_hoja_calculo.get()))
-        self.checkbox_hoja = CTkCheckBox(frame_checkbox, text="Hoja de cálculo", font=("Calibri",17), 
-                                    border_color="#d11515", border_width=2, fg_color="#d11515", 
-                                    hover_color="#d11515", variable=self.var_hoja_calculo)
-        self.checkbox_hoja.pack(side="left", anchor="w", fill="both", expand=True, ipady=10, padx=(20, 10), pady=(0, 10))
+        self.checkbox_hoja = CTkCheckBox(frame_checkbox, text="Hoja", font=("Calibri",12), width=5,
+                                        border_color="#d11515", border_width=2, fg_color="#d11515", 
+                                        hover_color="#d11515", variable=self.var_hoja_calculo)
+        self.checkbox_hoja.pack(side="left", padx=(30,10), pady=(0, 10))
         
         self.var_fichero_local = BooleanVar()
         self.var_fichero_local.set(False)
         self.var_fichero_local.trace("w", lambda *args: self.var_hoja_calculo.set(not self.var_fichero_local.get()))
-        self.checkbox_fichero = CTkCheckBox(frame_checkbox, text="Fichero local", font=("Calibri",17), 
-                                    border_color="#d11515", border_width=2, fg_color="#d11515", 
-                                    hover_color="#d11515", variable=self.var_fichero_local)
-        self.checkbox_fichero.pack(side="right", anchor="w", fill="both", expand=True, ipady=10, padx=(10, 20), pady=(0, 10))
+        self.checkbox_fichero = CTkCheckBox(frame_checkbox, text="Fichero", font=("Calibri",12), width=5,
+                                            border_color="#d11515", border_width=2, fg_color="#d11515", 
+                                            hover_color="#d11515", variable=self.var_fichero_local)
+        self.checkbox_fichero.pack(side="left", padx=(10,30), pady=(0, 10))
         
-        self.boton3 = CTkButton(frame_botones, text="PREPARAR BASES", font=("Calibri",17), text_color="black", 
-                                fg_color="transparent", border_color="black", border_width=3, hover_color="#d11515", 
-                                width=25, corner_radius=10, command=lambda: self.iniciar_proceso(3))
-        self.boton3.pack(anchor="center", fill="both", expand=True, ipady=10, padx=(20, 20), pady=(20, 0))
+        self.boton3 = CTkButton(frame_botones, text="Preparar Bases", font=("Calibri",12), text_color="black", 
+                                fg_color="transparent", border_color="black", border_width=2, hover_color="#d11515", 
+                                width=200, corner_radius=5, command=lambda: self.iniciar_proceso(3))
+        self.boton3.pack(fill="both", expand=True, ipady=5, padx=10, pady=(10, 0))
         
-        self.boton4 = CTkButton(frame_botones, text="EXPORTAR TXT", font=("Calibri",17), text_color="black", 
-                                fg_color="transparent", border_color="black", border_width=3, hover_color="#d11515", 
-                                width=25, corner_radius=10, command=lambda: self.iniciar_proceso(4))
-        self.boton4.pack(anchor="center", fill="both", expand=True, ipady=10, padx=(20, 20), pady=(20, 20))
+        self.boton4 = CTkButton(frame_botones, text="Exportar TXT", font=("Calibri",12), text_color="black", 
+                                fg_color="transparent", border_color="black", border_width=2, hover_color="#d11515", 
+                                width=200, corner_radius=5, command=lambda: self.iniciar_proceso(4))
+        self.boton4.pack(fill="both", expand=True, ipady=5, padx=10, pady=10)
+        
+        frame_output = CTkFrame(main_frame)
+        frame_output.pack(fill="both", expand=True, padx=10, pady=(10, 0))
+        
+        frame_detalles = CTkFrame(frame_output, bg_color="transparent", fg_color="transparent")
+        frame_detalles.pack(side="left", fill="both", expand=True, padx=(25,5))
+        
+        label_detalles = CTkLabel(frame_detalles, text=" - Detalles - ", font=("Calibri",12,"bold"))
+        label_detalles.grid(row=0, column=0, columnspan=2, padx=0, pady=0, sticky="nsew")
+        
+        label_nivel1 = CTkLabel(frame_detalles, text="Nivel 1: ", font=("Calibri",12))
+        label_nivel1.grid(row=1, column=0, padx=0, pady=0, sticky="e")
+        self.entry_nivel1 = CTkEntry(frame_detalles, font=("Calibri",12), width=30, height=5, border_width=0, state="readonly")
+        self.entry_nivel1.grid(row=1, column=1, padx=0, pady=0, sticky="w")
+        
+        label_ld = CTkLabel(frame_detalles, text="LD: ", font=("Calibri",12))
+        label_ld.grid(row=2, column=0, padx=0, pady=(0,5), sticky="e")
+        self.entry_ld = CTkEntry(frame_detalles, font=("Calibri",12), width=30, height=5, border_width=0, state="readonly")
+        self.entry_ld.grid(row=2, column=1, padx=0, pady=(0,5), sticky="w")
+        
+        frame_tiempos = CTkFrame(frame_output, bg_color="transparent", fg_color="transparent")
+        frame_tiempos.pack(side="right", fill="both", expand=True, padx=(5,25))
+        
+        label_tiempos = CTkLabel(frame_tiempos, text=" - Tiempos - ", font=("Calibri",12,"bold"))
+        label_tiempos.grid(row=0, column=0, columnspan=2, padx=0, pady=0, sticky="nsew")
+        
+        label_proceso = CTkLabel(frame_tiempos, text="Proceso: ", font=("Calibri",12))
+        label_proceso.grid(row=1, column=0, padx=0, pady=0, sticky="e")
+        self.entry_proceso = CTkEntry(frame_tiempos, font=("Calibri",12), width=43, height=5, border_width=0, state="readonly")
+        self.entry_proceso.grid(row=1, column=1, padx=0, pady=0, sticky="w")
+        
+        label_total = CTkLabel(frame_tiempos, text="Total: ", font=("Calibri",12))
+        label_total.grid(row=2, column=0, padx=0, pady=(0,5), sticky="e")
+        self.entry_total = CTkEntry(frame_tiempos, font=("Calibri",12), width=43, height=5, border_width=0, state="readonly")
+        self.entry_total.grid(row=2, column=1, padx=0, pady=(0,5), sticky="w")
+        
+        frame_salir = CTkFrame(main_frame)
+        frame_salir.pack(fill="both", expand=True, padx=10, pady=(10, 0))
+        
+        self.boton_salir = CTkButton(frame_salir, text="Salir", font=("Calibri",12), text_color="black", 
+                                    fg_color="transparent", border_color="black", border_width=2, hover_color="#d11515", 
+                                    width=50, height=10, corner_radius=5, command=self.salir)
+        self.boton_salir.pack(padx=50, pady=5)
         
         self.progressbar = CTkProgressBar(main_frame, mode="indeterminate", orientation="horizontal", 
-                                            progress_color="#d11515", height=10, border_width=0)
-        self.progressbar.grid(row=2, column=0, padx=(20, 20), pady=(10, 0), sticky="nsew")
-        
-        self.boton_salir = CTkButton(main_frame, text="SALIR", font=("Calibri",17), text_color="black", 
-                                    fg_color="transparent", border_color="black", border_width=3, hover_color="#d11515", 
-                                    width=10, corner_radius=10, command=self.salir)
-        self.boton_salir.grid(row=3, column=0, padx=(150, 150), pady=(20, 20), sticky="nsew")
+                                            progress_color="#d11515", height=7, border_width=0)
+        self.progressbar.pack(fill="x", expand=True, padx=10, pady=10)
         
         self.app.mainloop()
 

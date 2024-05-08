@@ -206,8 +206,5 @@ class Clase_SMS:
         with open(self.ld_txt, "w") as f:
             for item in lista_ld:
                 f.write("%s\n" % item)
-        # Mensajes listos
-        messagebox.showinfo("SMS C&CD", "MENSAJES LISTOS!!!\n"
-                            + "\n- LD: " + str(len(lista_ld)) + " destinatarios." 
-                            + "\n- Nivel 1: " + str(len(lista_nivel_1)) + " destinatarios.")
-        os.startfile(resource_path("./CARGAS/"))
+        # Resultados
+        return str(len(lista_nivel_1)), str(len(lista_ld))

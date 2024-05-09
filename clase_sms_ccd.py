@@ -1,5 +1,4 @@
 from resource_path import *
-from tkinter import messagebox
 import pandas as pd
 
 class Clase_SMS:
@@ -69,14 +68,9 @@ class Clase_SMS:
         df_celulares["NOMBRE"] = df_celulares["NOMBRE"].str.replace("Ñ", "N")
         df_celulares["NOMBRE"] = df_celulares["NOMBRE"].str.replace("  ", " ")
         df_celulares["NOMBRE"] = df_celulares["NOMBRE"].str.replace("  ", " ")
-        if total_deudores == total_celulares:
-            messagebox.showinfo("INFO", "Todos los socios["+str(total_deudores)+"] cuentan con celulares.")
-        else:
-            messagebox.showinfo("INFO", "BASE DE CELULARES ACTUALIZADA!\n"
-                                + "\n- CON CELULAR: " + str(total_celulares) 
-                                + "\n- SIN CELULAR: " + str(total_deudores-total_celulares)
-                                + "\n- TOTAL: " + str(total_deudores))
         self.df_celulares = df_celulares
+        resultados = [total_deudores, total_celulares]
+        return resultados
     
     def generar_texto(self, row):
         if self.contador == 0:
@@ -188,11 +182,10 @@ class Clase_SMS:
         df_cruce_zfir60["TEXTO"] = df_cruce_zfir60.apply(self.generar_texto, axis=1)
         self.df_cruce_zfir60 = df_cruce_zfir60
         self.contador = 0
-        
-        messagebox.showinfo("INFO", "REGISTROS VALIDADOS:\n" 
-                            + "\n- En LD de EQUIPOS: " + str(self.df_cruce_modelo.shape[0])
-                            + "\n- En LD de RECAUDACION: " + str(self.df_cruce_recaudacion.shape[0])
-                            + "\n- Con Deuda Vencida (ZFIR60): " + str(df_cruce_zfir60.shape[0]))
+    
+    def return_resultados(self):
+        resultados = [self.df_cruce_modelo.shape[0], self.df_cruce_recaudacion.shape[0], self.df_cruce_zfir60.shape[0]]
+        return resultados
     
     def exportar_archivos_txt(self):
         # Nivel 1

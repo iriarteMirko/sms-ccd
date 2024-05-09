@@ -1,6 +1,6 @@
 from clase_sms_ccd import Clase_SMS
 from datetime import datetime, timedelta
-from tkinter import messagebox
+from tkinter import messagebox, Entry
 from customtkinter import *
 from resource_path import *
 import pandas as pd
@@ -57,12 +57,21 @@ class App_SMS():
         self.progressbar.start()
         try:
             inicio = time.time()
-            self.reporte.actualizar_base_celulares()
+            resultados = self.reporte.actualizar_base_celulares()
+            total_deudores = resultados[0]
+            total_celulares = resultados[1]
         except Exception as e:
             messagebox.showerror("ERROR", "Algo salió mal. Por favor, intente nuevamente.\n\nDetalles: " + str(e))
         finally:
             fin = time.time()
             self.proceso1 = fin - inicio
+            if total_deudores == total_celulares:
+                messagebox.showinfo("INFO", "Todos los socios["+str(total_deudores)+"] cuentan con celulares.")
+            else:
+                messagebox.showinfo("INFO", "BASE DE CELULARES ACTUALIZADA!\n"
+                                    + "\n- CON CELULAR: " + str(total_celulares) 
+                                    + "\n- SIN CELULAR: " + str(total_deudores-total_celulares)
+                                    + "\n- TOTAL: " + str(total_deudores))
             self.progressbar.stop()
     
     def accion_boton2(self):
@@ -90,11 +99,19 @@ class App_SMS():
             self.reporte.preparar_recaudacion()
             self.reporte.preparar_modelo()
             self.reporte.preparar_zfir60()
+            resultados = self.reporte.return_resultados()
+            ld_equipos = resultados[0]
+            ld_recaudacion = resultados[1]
+            zfir60 = resultados[2]
         except Exception as e:
             messagebox.showerror("ERROR", "Algo salió mal. Por favor, intente nuevamente.\n\nDetalles: " + str(e))
         finally:
             fin = time.time()
             self.proceso3 = fin - inicio
+            messagebox.showinfo("INFO", "REGISTROS VALIDADOS:\n" 
+                            + "\n- En LD de EQUIPOS: " + str(ld_equipos)
+                            + "\n- En LD de RECAUDACION: " + str(ld_recaudacion)
+                            + "\n- Con Deuda Vencida (ZFIR60): " + str(zfir60))
             self.progressbar.stop()
     
     def accion_boton4(self):
@@ -160,7 +177,7 @@ class App_SMS():
     def crear_app(self):        
         self.app = CTk()
         self.app.title("SMS C&CD")
-        icon_path = resource_path("./images/icono.ico")
+        icon_path = resource_path("./images/sms.ico")
         if os.path.isfile(icon_path):
             self.app.iconbitmap(icon_path)
         else:
@@ -172,24 +189,18 @@ class App_SMS():
         main_frame.pack_propagate("True")
         main_frame.pack(fill="both", expand=True)
         
-        frame_title = CTkFrame(main_frame)
-        frame_title.pack(fill="both", expand=True, padx=10, pady=(10, 0))
-        
-        titulo = CTkLabel(frame_title, text="SMS C&CD", font=("Calibri",15,"bold"))
-        titulo.pack(fill="both", expand=True, ipady=5, padx=10)
-        
         frame_botones = CTkFrame(main_frame)
         frame_botones.pack(fill="both", expand=True, padx=10, pady=(10, 0))
         
         self.boton1 = CTkButton(frame_botones, text="Actualizar Números", font=("Calibri",12), text_color="black", 
                                 fg_color="transparent", border_color="black", border_width=2, hover_color="#d11515", 
                                 width=200, corner_radius=5, command=lambda: self.iniciar_proceso(1))
-        self.boton1.pack(fill="both", expand=True, ipady=5, padx=10, pady=(10, 0))
+        self.boton1.pack(fill="both", expand=True, ipady=2, padx=10, pady=(10, 0))
         
         self.boton2 = CTkButton(frame_botones, text="Exportar Deudores", font=("Calibri",12), text_color="black", 
                                 fg_color="transparent", border_color="black", border_width=2, hover_color="#d11515", 
                                 width=200, corner_radius=5, command=lambda: self.iniciar_proceso(2))
-        self.boton2.pack(fill="both", expand=True, ipady=5, padx=10, pady=(10, 0))
+        self.boton2.pack(fill="both", expand=True, ipady=2, padx=10, pady=(10, 0))
         
         frame_checkbox = CTkFrame(frame_botones, border_width=2, border_color="black")
         frame_checkbox.pack(fill="both", expand=True, padx=10, pady=(10, 0))
@@ -200,7 +211,7 @@ class App_SMS():
         self.var_hoja_calculo = BooleanVar()
         self.var_hoja_calculo.set(True)
         self.var_hoja_calculo.trace("w", lambda *args: self.var_fichero_local.set(not self.var_hoja_calculo.get()))
-        self.checkbox_hoja = CTkCheckBox(frame_checkbox, text="Hoja", font=("Calibri",12), width=5,
+        self.checkbox_hoja = CTkCheckBox(frame_checkbox, text="Hoja", font=("Calibri",12), width=5, 
                                         border_color="#d11515", border_width=2, fg_color="#d11515", 
                                         hover_color="#d11515", variable=self.var_hoja_calculo)
         self.checkbox_hoja.pack(side="left", padx=(30,10), pady=(0, 10))
@@ -208,7 +219,7 @@ class App_SMS():
         self.var_fichero_local = BooleanVar()
         self.var_fichero_local.set(False)
         self.var_fichero_local.trace("w", lambda *args: self.var_hoja_calculo.set(not self.var_fichero_local.get()))
-        self.checkbox_fichero = CTkCheckBox(frame_checkbox, text="Fichero", font=("Calibri",12), width=5,
+        self.checkbox_fichero = CTkCheckBox(frame_checkbox, text="Fichero", font=("Calibri",12), width=5, 
                                             border_color="#d11515", border_width=2, fg_color="#d11515", 
                                             hover_color="#d11515", variable=self.var_fichero_local)
         self.checkbox_fichero.pack(side="left", padx=(10,30), pady=(0, 10))
@@ -216,55 +227,40 @@ class App_SMS():
         self.boton3 = CTkButton(frame_botones, text="Preparar Bases", font=("Calibri",12), text_color="black", 
                                 fg_color="transparent", border_color="black", border_width=2, hover_color="#d11515", 
                                 width=200, corner_radius=5, command=lambda: self.iniciar_proceso(3))
-        self.boton3.pack(fill="both", expand=True, ipady=5, padx=10, pady=(10, 0))
+        self.boton3.pack(fill="both", expand=True, ipady=2, padx=10, pady=(10, 0))
         
         self.boton4 = CTkButton(frame_botones, text="Exportar TXT", font=("Calibri",12), text_color="black", 
                                 fg_color="transparent", border_color="black", border_width=2, hover_color="#d11515", 
                                 width=200, corner_radius=5, command=lambda: self.iniciar_proceso(4))
-        self.boton4.pack(fill="both", expand=True, ipady=5, padx=10, pady=10)
+        self.boton4.pack(fill="both", expand=True, ipady=2, padx=10, pady=(10, 0))
+        
+        self.boton_salir = CTkButton(frame_botones, text="Salir", font=("Calibri",12), text_color="black", 
+                                    fg_color="transparent", border_color="black", border_width=2, hover_color="#d11515", 
+                                    width=100, height=10, corner_radius=5, command=self.salir)
+        self.boton_salir.pack(ipady=2, padx=50, pady=10)
         
         frame_output = CTkFrame(main_frame)
         frame_output.pack(fill="both", expand=True, padx=10, pady=(10, 0))
         
-        frame_detalles = CTkFrame(frame_output, bg_color="transparent", fg_color="transparent")
-        frame_detalles.pack(side="left", fill="both", expand=True, padx=(25,5))
+        label_nivel1 = CTkLabel(frame_output, text="Nivel 1: ", font=("Calibri",12))
+        label_nivel1.grid(row=0, column=0, padx=(25,0), pady=(5,0), sticky="e")
+        self.entry_nivel1 = Entry(frame_output, font=("Calibri",12), width=5, state="readonly")
+        self.entry_nivel1.grid(row=0, column=1, padx=(0,10), pady=(5,0), sticky="w")
         
-        label_detalles = CTkLabel(frame_detalles, text=" - Detalles - ", font=("Calibri",12,"bold"))
-        label_detalles.grid(row=0, column=0, columnspan=2, padx=0, pady=0, sticky="nsew")
+        label_ld = CTkLabel(frame_output, text="LD: ", font=("Calibri",12))
+        label_ld.grid(row=1, column=0, padx=(25,0), pady=(0,5), sticky="e")
+        self.entry_ld = Entry(frame_output, font=("Calibri",12), width=5, state="readonly")
+        self.entry_ld.grid(row=1, column=1, padx=(0,10), pady=(0,5), sticky="w")
         
-        label_nivel1 = CTkLabel(frame_detalles, text="Nivel 1: ", font=("Calibri",12))
-        label_nivel1.grid(row=1, column=0, padx=0, pady=0, sticky="e")
-        self.entry_nivel1 = CTkEntry(frame_detalles, font=("Calibri",12), width=30, height=5, border_width=0, state="readonly")
-        self.entry_nivel1.grid(row=1, column=1, padx=0, pady=0, sticky="w")
+        label_proceso = CTkLabel(frame_output, text="Proceso: ", font=("Calibri",12))
+        label_proceso.grid(row=0, column=2, padx=(10,0), pady=(5,0), sticky="e")
+        self.entry_proceso = Entry(frame_output, font=("Calibri",12), width=7, state="readonly")
+        self.entry_proceso.grid(row=0, column=3, padx=(0,10), pady=(5,0), sticky="w")
         
-        label_ld = CTkLabel(frame_detalles, text="LD: ", font=("Calibri",12))
-        label_ld.grid(row=2, column=0, padx=0, pady=(0,5), sticky="e")
-        self.entry_ld = CTkEntry(frame_detalles, font=("Calibri",12), width=30, height=5, border_width=0, state="readonly")
-        self.entry_ld.grid(row=2, column=1, padx=0, pady=(0,5), sticky="w")
-        
-        frame_tiempos = CTkFrame(frame_output, bg_color="transparent", fg_color="transparent")
-        frame_tiempos.pack(side="right", fill="both", expand=True, padx=(5,25))
-        
-        label_tiempos = CTkLabel(frame_tiempos, text=" - Tiempos - ", font=("Calibri",12,"bold"))
-        label_tiempos.grid(row=0, column=0, columnspan=2, padx=0, pady=0, sticky="nsew")
-        
-        label_proceso = CTkLabel(frame_tiempos, text="Proceso: ", font=("Calibri",12))
-        label_proceso.grid(row=1, column=0, padx=0, pady=0, sticky="e")
-        self.entry_proceso = CTkEntry(frame_tiempos, font=("Calibri",12), width=43, height=5, border_width=0, state="readonly")
-        self.entry_proceso.grid(row=1, column=1, padx=0, pady=0, sticky="w")
-        
-        label_total = CTkLabel(frame_tiempos, text="Total: ", font=("Calibri",12))
-        label_total.grid(row=2, column=0, padx=0, pady=(0,5), sticky="e")
-        self.entry_total = CTkEntry(frame_tiempos, font=("Calibri",12), width=43, height=5, border_width=0, state="readonly")
-        self.entry_total.grid(row=2, column=1, padx=0, pady=(0,5), sticky="w")
-        
-        frame_salir = CTkFrame(main_frame)
-        frame_salir.pack(fill="both", expand=True, padx=10, pady=(10, 0))
-        
-        self.boton_salir = CTkButton(frame_salir, text="Salir", font=("Calibri",12), text_color="black", 
-                                    fg_color="transparent", border_color="black", border_width=2, hover_color="#d11515", 
-                                    width=50, height=10, corner_radius=5, command=self.salir)
-        self.boton_salir.pack(padx=50, pady=5)
+        label_total = CTkLabel(frame_output, text="Total: ", font=("Calibri",12))
+        label_total.grid(row=1, column=2, padx=(10,0), pady=(0,5), sticky="e")
+        self.entry_total = Entry(frame_output, font=("Calibri",12), width=7, state="readonly")
+        self.entry_total.grid(row=1, column=3, padx=(0,10), pady=(0,5), sticky="w")
         
         self.progressbar = CTkProgressBar(main_frame, mode="indeterminate", orientation="horizontal", 
                                             progress_color="#d11515", height=7, border_width=0)

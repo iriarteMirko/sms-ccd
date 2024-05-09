@@ -58,13 +58,10 @@ class App_SMS():
         try:
             inicio = time.time()
             resultados = self.reporte.actualizar_base_celulares()
-            total_deudores = resultados[0]
-            total_celulares = resultados[1]
-        except Exception as e:
-            messagebox.showerror("ERROR", "Algo salió mal. Por favor, intente nuevamente.\n\nDetalles: " + str(e))
-        finally:
             fin = time.time()
             self.proceso1 = fin - inicio
+            total_deudores = resultados[0]
+            total_celulares = resultados[1]
             if total_deudores == total_celulares:
                 messagebox.showinfo("INFO", "Todos los socios["+str(total_deudores)+"] cuentan con celulares.")
             else:
@@ -72,6 +69,9 @@ class App_SMS():
                                     + "\n- CON CELULAR: " + str(total_celulares) 
                                     + "\n- SIN CELULAR: " + str(total_deudores-total_celulares)
                                     + "\n- TOTAL: " + str(total_deudores))
+        except Exception as e:
+            messagebox.showerror("ERROR", "Algo salió mal. Por favor, intente nuevamente.\n\nDetalles: " + str(e))
+        finally:
             self.progressbar.stop()
     
     def accion_boton2(self):
@@ -79,13 +79,13 @@ class App_SMS():
         try:
             inicio = time.time()
             self.reporte.exportar_deudores()
+            fin = time.time()
+            self.proceso2 = fin - inicio
+            self.inicio_sap = time.time()
         except Exception as e:
             messagebox.showerror("ERROR", "Algo salió mal. Por favor, intente nuevamente.\n\nDetalles: " + str(e))
         finally:
-            fin = time.time()
-            self.proceso2 = fin - inicio
             self.progressbar.stop()
-            self.inicio_sap = time.time()
     
     def accion_boton3(self):
         self.fin_sap = time.time()
@@ -100,18 +100,18 @@ class App_SMS():
             self.reporte.preparar_modelo()
             self.reporte.preparar_zfir60()
             resultados = self.reporte.return_resultados()
+            fin = time.time()
+            self.proceso3 = fin - inicio
             ld_equipos = resultados[0]
             ld_recaudacion = resultados[1]
             zfir60 = resultados[2]
-        except Exception as e:
-            messagebox.showerror("ERROR", "Algo salió mal. Por favor, intente nuevamente.\n\nDetalles: " + str(e))
-        finally:
-            fin = time.time()
-            self.proceso3 = fin - inicio
             messagebox.showinfo("INFO", "REGISTROS VALIDADOS:\n" 
                             + "\n- En LD de EQUIPOS: " + str(ld_equipos)
                             + "\n- En LD de RECAUDACION: " + str(ld_recaudacion)
                             + "\n- Con Deuda Vencida (ZFIR60): " + str(zfir60))
+        except Exception as e:
+            messagebox.showerror("ERROR", "Algo salió mal. Por favor, intente nuevamente.\n\nDetalles: " + str(e))
+        finally:
             self.progressbar.stop()
     
     def accion_boton4(self):
@@ -119,12 +119,8 @@ class App_SMS():
         try:
             inicio = time.time()
             lista_nivel_1, lista_ld = self.reporte.exportar_archivos_txt()
-        except Exception as e:
-            messagebox.showerror("ERROR", "Algo salió mal. Por favor, intente nuevamente.\nDetalles: " + str(e))
-        finally:
             fin = time.time()
             proceso4 = fin - inicio
-            self.progressbar.stop()
             self.tiempo_proceso = round((self.proceso1 + self.proceso2 + self.proceso3 + proceso4),2)
             tiempo_sap = round((self.fin_sap - self.inicio_sap),2)
             self.tiempo_total = round((self.tiempo_proceso + tiempo_sap),2)
@@ -155,6 +151,10 @@ class App_SMS():
                                 + "\n- SAP: " + str(tiempo_sap) + " segundos."
                                 + "\n- Total: " + str(self.tiempo_total) + " segundos.")
             os.startfile(resource_path("./CARGAS/"))
+        except Exception as e:
+            messagebox.showerror("ERROR", "Algo salió mal. Por favor, intente nuevamente.\nDetalles: " + str(e))
+        finally:
+            self.progressbar.stop()
     
     def generar_reporte(self):
         try:

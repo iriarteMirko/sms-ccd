@@ -1,267 +1,211 @@
-from clase_sms_ccd import resource_path, SMS
-from tkinter import messagebox, Entry
-from customtkinter import CTk, CTkFrame, CTkButton, CTkCheckBox, CTkLabel, CTkProgressBar
-from customtkinter import set_appearance_mode, BooleanVar, os
-import warnings
-import threading
-import time
+from datetime import datetime, timedelta
+from resource_path import *
+import pandas as pd
 
-warnings.filterwarnings("ignore")
 
-class App_SMS():
-    def salir(self):
-        self.app.destroy()
+class SMS:
+    def __init__(self):
+        self.rutas_path = resource_path("./RUTAS.xlsx")
+        df_rutas = pd.read_excel(self.rutas_path, sheet_name="RUTAS")
+        
+        fecha_hoy = datetime.today()
+        fecha_ayer = fecha_hoy - timedelta(days=1)
+        self.fecha_ayer = fecha_ayer.strftime("%Y%m%d")
+        self.fecha_hoy = fecha_hoy.strftime("%Y%m%d")
+        self.fecha_hoy_txt = datetime.today().strftime("%d.%m.%Y")
+        
+        self.ruta_zfir60 = df_rutas["RUTA"][0] + "ZFIR60_"+self.fecha_hoy+".xlsx"
+        self.ruta_modelo = df_rutas["RUTA"][1] + "Modelo de Evaluación de Pedidos de Equipos_"+self.fecha_hoy+".xlsx"
+        self.ruta_dacxanalista = df_rutas["RUTA"][2]
+        self.reporte_recaudacion = df_rutas["RUTAS"][3] + "Reporte_Recaudacion_"+self.fecha_hoy+".csv"
+        self.ruta_base_celulares = df_rutas["RUTA"][4]
+        self.fbl5n_hoja = df_rutas["RUTA"][5]
+        self.fbl5n_fichero = df_rutas["RUTA"][6]
+        self.deudores = df_rutas["RUTA"][7]
+        
+        self.ld_txt = df_rutas["RUTAS"][8] + "LD "+self.fecha_hoy_txt+".txt"
+        self.nivel_1_txt = df_rutas["RUTAS"][9] + "Nivel 1 "+self.fecha_hoy_txt+".txt"
+        
+        self.contador = 0
     
-    def deshabilitar_botones(self):
-        self.boton1.configure(state="disabled")
-        self.boton2.configure(state="disabled")
-        self.checkbox_hoja.configure(state="disabled")
-        self.checkbox_fichero.configure(state="disabled")
-        self.boton3.configure(state="disabled")
-        self.boton4.configure(state="disabled")
-        self.boton_salir.configure(state="disabled")
+    def abrir_archivo(self, path):
+        os.startfile(resource_path(path))
     
-    def habilitar_botones(self):
-        self.boton1.configure(state="normal")
-        self.boton2.configure(state="normal")
-        self.checkbox_hoja.configure(state="normal")
-        self.checkbox_fichero.configure(state="normal")
-        self.boton3.configure(state="normal")
-        self.boton4.configure(state="normal")
-        self.boton_salir.configure(state="normal")
+    def actualizar_base_celulares(self):
+        df_base_celulares = pd.read_excel(self.ruta_base_celulares)
+        df_dacxanalista = pd.read_excel(self.ruta_dacxanalista, sheet_name="Base_NUEVA")
+        df_dac_tipos = pd.read_excel(self.rutas_path, sheet_name="DACS")
+        lista_tipo_dac_no_validos = df_dac_tipos["TIPOS_NO_VALIDOS"].to_list()
+        columnas_requeridas = ["DEUDOR", "NOMBRE", "REGION", "ANALISTA_ACT", "TIPO_DAC", "ESTADO"]
+        df_dacxanalista = df_dacxanalista[columnas_requeridas]
+        df_dacxanalista = df_dacxanalista[~df_dacxanalista["TIPO_DAC"].isin(lista_tipo_dac_no_validos)]
+        df_dacxanalista = df_dacxanalista[df_dacxanalista["ESTADO"].isin(["OPERATIVO CON MOVIMIENTO", "OPERATIVO SIN MOVIMIENTO"])]
+        df_dacxanalista = df_dacxanalista.merge(df_base_celulares, on="DEUDOR", how="right")
+        df_dacxanalista = df_dacxanalista.rename(columns={
+            "NOMBRE_x": "NOMBRE",
+            "REGION_x": "REGION",
+            "ANALISTA_ACT_x": "ANALISTA_ACT",
+            "TIPO_DAC_x": "TIPO_DAC",
+            "ESTADO_x": "ESTADO"
+        })
+        df_dacxanalista = df_dacxanalista[columnas_requeridas + ["CELULAR"]]
+        df_dacxanalista["CELULAR"] = df_dacxanalista["CELULAR"].astype("Int64")
+        df_dacxanalista.dropna(subset=["NOMBRE"], inplace=True)
+        df_dacxanalista["CELULAR"] = df_dacxanalista["CELULAR"].fillna(0)
+        df_dacxanalista.reset_index(drop=True, inplace=True)
+        df_dacxanalista.to_excel(self.ruta_base_celulares, index=False)
+        # Preparar base celulares
+        df_celulares = df_dacxanalista[["DEUDOR", "NOMBRE", "CELULAR"]]
+        total_deudores = df_celulares.shape[0]
+        df_celulares = df_celulares[df_celulares["CELULAR"]!=0]
+        df_celulares.reset_index(drop=True, inplace=True)
+        total_celulares = df_celulares.shape[0]
+        # Limpiar nombres
+        df_celulares["NOMBRE"] = df_celulares["NOMBRE"].str.replace("á", "a")
+        df_celulares["NOMBRE"] = df_celulares["NOMBRE"].str.replace("é", "e")
+        df_celulares["NOMBRE"] = df_celulares["NOMBRE"].str.replace("í", "i")
+        df_celulares["NOMBRE"] = df_celulares["NOMBRE"].str.replace("ó", "o")
+        df_celulares["NOMBRE"] = df_celulares["NOMBRE"].str.replace("ú", "u")
+        df_celulares["NOMBRE"] = df_celulares["NOMBRE"].str.replace("ñ", "n")
+        df_celulares["NOMBRE"] = df_celulares["NOMBRE"].str.replace("Á", "A")
+        df_celulares["NOMBRE"] = df_celulares["NOMBRE"].str.replace("É", "E")
+        df_celulares["NOMBRE"] = df_celulares["NOMBRE"].str.replace("Í", "I")
+        df_celulares["NOMBRE"] = df_celulares["NOMBRE"].str.replace("Ó", "O")
+        df_celulares["NOMBRE"] = df_celulares["NOMBRE"].str.replace("Ú", "U")
+        df_celulares["NOMBRE"] = df_celulares["NOMBRE"].str.replace("Ñ", "N")
+        df_celulares["NOMBRE"] = df_celulares["NOMBRE"].str.replace("  ", " ")
+        df_celulares["NOMBRE"] = df_celulares["NOMBRE"].str.replace("  ", " ")
+        self.df_celulares = df_celulares
+        resultados = [total_deudores, total_celulares]
+        return resultados
     
-    def verificar_thread(self, thread):
-        if thread.is_alive():
-            self.app.after(1000, self.verificar_thread, thread)
+    def generar_texto(self, row):
+        df_texto = pd.read_excel(self.rutas_path, sheet_name="TEXTO")
+        if self.contador == 0:
+            if row["TIPO"] == "DISPONIBLE":
+                return f'51{row["CELULAR"]}{df_texto["TEXTO_1"][0]}{row["NOMBRE"]}{df_texto["TEXTO_2"][0]}{row["TOTAL"]}{df_texto["TEXTO_3"][0]}'
+            elif row["TIPO"] == "SOBREGIRO":
+                return f'51{row["CELULAR"]}{df_texto["TEXTO_1"][1]}{row["NOMBRE"]}{df_texto["TEXTO_2"][1]}{row["TOTAL"]}{df_texto["TEXTO_3"][1]}'
+            elif row["TIPO"] == "SIN_LINEA":
+                return f'51{row["CELULAR"]}{df_texto["TEXTO_1"][2]}{row["NOMBRE"]}{df_texto["TEXTO_2"][2]}'
+        elif self.contador == 1:
+            if row["TIPO"] == "DISPONIBLE":
+                return f'51{row["CELULAR"]}{df_texto["TEXTO_1"][3]}{row["NOMBRE"]}{df_texto["TEXTO_2"][3]}{row["TOTAL"]}{df_texto["TEXTO_3"][3]}'
+            elif row["TIPO"] == "SOBREGIRO":
+                return f'51{row["CELULAR"]}{df_texto["TEXTO_1"][4]}{row["NOMBRE"]}{df_texto["TEXTO_2"][4]}{row["TOTAL"]}{df_texto["TEXTO_3"][4]}'
+            elif row["TIPO"] == "SIN_LINEA":
+                return f'51{row["CELULAR"]}{df_texto["TEXTO_1"][5]}{row["NOMBRE"]}{df_texto["TEXTO_2"][5]}'
         else:
-            self.habilitar_botones()
+            return f'51{row["CELULAR"]}{df_texto["TEXTO_1"][6]}{row["Total Vencida"]}{df_texto["TEXTO_2"][5]}'
     
-    def iniciar_proceso(self, accion):
-        self.deshabilitar_botones()
-        if accion == 1:
-            thread = threading.Thread(target=self.accion_boton1)
-        elif accion == 2:
-            thread = threading.Thread(target=self.accion_boton2)
-        elif accion == 3:
-            thread = threading.Thread(target=self.accion_boton3)
-        elif accion == 4:
-            thread = threading.Thread(target=self.accion_boton4)
-        else:
-            return        
-        thread.start()
-        self.app.after(1000, self.verificar_thread, thread)
+    def exportar_deudores(self):
+        df_recaudacion = pd.read_csv(self.reporte_recaudacion, encoding="latin1")
+        df_recaudacion = df_recaudacion.drop("USER_ID", axis=1)
+        df_recaudacion = df_recaudacion[df_recaudacion["FECHA_RECAUDACION"] == int(self.fecha_ayer)]
+        df_recaudacion[["SAP"]].to_excel(self.deudores, index=False)
+        df_recaudacion.reset_index(drop=True, inplace=True)
+        self.df_recaudacion = df_recaudacion
+        self.abrir_archivo(self.deudores)
     
-    def accion_boton1(self):
-        self.progressbar.start()
-        try:
-            inicio = time.time()
-            resultados = self.reporte.actualizar_base_celulares()
-            fin = time.time()
-            self.proceso1 = fin - inicio
-            total_deudores = resultados[0]
-            total_celulares = resultados[1]
-            if total_deudores == total_celulares:
-                messagebox.showinfo("INFO", "Todos los socios["+str(total_deudores)+"] cuentan con celulares.")
-            else:
-                messagebox.showinfo("INFO", "BASE DE CELULARES ACTUALIZADA!\n"
-                                    + "\n- CON CELULAR: " + str(total_celulares) 
-                                    + "\n- SIN CELULAR: " + str(total_deudores-total_celulares)
-                                    + "\n- TOTAL: " + str(total_deudores))
-        except Exception as e:
-            messagebox.showerror("ERROR", "Algo salió mal. Por favor, intente nuevamente.\n\nDetalles: " + str(e))
-        finally:
-            self.progressbar.stop()
+    def preparar_fbl5n_hoja_calculo(self):
+        df_fbl5n = pd.read_excel(self.fbl5n_hoja)
+        df_fbl5n = df_fbl5n[df_fbl5n["Cuenta"].notna()]
+        df_fbl5n = df_fbl5n[df_fbl5n["ACC"] == "PE07"]
+        df_fbl5n = df_fbl5n[["Cuenta","Importe en ML"]]
+        df_fbl5n["Importe en ML"] = df_fbl5n["Importe en ML"] * -1
+        df_fbl5n = df_fbl5n.groupby("Cuenta")["Importe en ML"].sum().reset_index()
+        df_fbl5n.set_index("Cuenta", inplace=True)
+        self.df_fbl5n = df_fbl5n
     
-    def accion_boton2(self):
-        self.progressbar.start()
-        try:
-            inicio = time.time()
-            self.reporte.exportar_deudores()
-            fin = time.time()
-            self.proceso2 = fin - inicio
-            self.inicio_sap = time.time()
-        except Exception as e:
-            messagebox.showerror("ERROR", "Algo salió mal. Por favor, intente nuevamente.\n\nDetalles: " + str(e))
-        finally:
-            self.progressbar.stop()
+    def preparar_fbl5n_fichero_local(self):
+        df_fbl5n = pd.read_excel(self.fbl5n_fichero)
+        df_fbl5n = df_fbl5n.iloc[:, 3:] # Elimina las 3 primeras columnas
+        df_fbl5n = df_fbl5n.iloc[7:, :] # Elimina las 7 primeras filas
+        df_fbl5n = df_fbl5n.drop(df_fbl5n.index[1]) # Elimina la segunda fila (después de eliminar las 7 primeras)
+        df_fbl5n = df_fbl5n.iloc[:-3, :] # Elimina las 3 últimas filas
+        df_fbl5n.columns = df_fbl5n.iloc[0] # Nuevo encabezado
+        df_fbl5n = df_fbl5n[1:]
+        df_fbl5n = df_fbl5n[df_fbl5n["Cuenta"].notna()]
+        df_fbl5n = df_fbl5n[df_fbl5n["ACC"] == "PE07"]
+        df_fbl5n = df_fbl5n.rename(columns={"     Importe en ML":"Importe en ML"})
+        df_fbl5n = df_fbl5n[["Cuenta","Importe en ML"]]
+        df_fbl5n["Importe en ML"] = df_fbl5n["Importe en ML"] * -1
+        df_fbl5n = df_fbl5n.groupby("Cuenta")["Importe en ML"].sum().reset_index()
+        df_fbl5n.set_index("Cuenta", inplace=True)
+        self.df_fbl5n = df_fbl5n
     
-    def accion_boton3(self):
-        self.fin_sap = time.time()
-        self.progressbar.start()
-        try:
-            inicio = time.time()
-            if self.var_hoja_calculo.get() == True:
-                self.reporte.preparar_fbl5n_hoja_calculo()
-            else:
-                self.reporte.preparar_fbl5n_fichero_local()
-            self.reporte.preparar_recaudacion()
-            self.reporte.preparar_modelo()
-            self.reporte.preparar_zfir60()
-            resultados = self.reporte.return_resultados()
-            fin = time.time()
-            self.proceso3 = fin - inicio
-            ld_equipos = resultados[0]
-            ld_recaudacion = resultados[1]
-            zfir60 = resultados[2]
-            messagebox.showinfo("INFO", "REGISTROS VALIDADOS:\n" 
-                            + "\n- En LD de EQUIPOS: " + str(ld_equipos)
-                            + "\n- En LD de RECAUDACION: " + str(ld_recaudacion)
-                            + "\n- Con Deuda Vencida (ZFIR60): " + str(zfir60))
-        except Exception as e:
-            messagebox.showerror("ERROR", "Algo salió mal. Por favor, intente nuevamente.\n\nDetalles: " + str(e))
-        finally:
-            self.progressbar.stop()
+    def preparar_recaudacion(self):
+        self.df_recaudacion["FALTA"] = self.df_recaudacion["SAP"].map(self.df_fbl5n["Importe en ML"])
+        self.df_recaudacion["FALTA"].fillna(0, inplace=True)
+        self.df_recaudacion["RESTA"] = self.df_recaudacion["LIMITE_CREDITICIO"] - self.df_recaudacion["SALDO_ACTUAL"]
+        self.df_recaudacion["TOTAL"] = self.df_recaudacion["FALTA"] + self.df_recaudacion["RESTA"]
+        
+        df_cruce_recaudacion = self.df_celulares.merge(self.df_recaudacion, left_on="DEUDOR", right_on="SAP", how="left")
+        df_cruce_recaudacion = df_cruce_recaudacion[["CELULAR", "NOMBRE", "TOTAL"]]
+        df_cruce_recaudacion["TOTAL"].fillna(0, inplace=True)
+        df_cruce_recaudacion = df_cruce_recaudacion.sort_values(by="TOTAL", ascending=True)
+        df_cruce_recaudacion["TIPO"] = df_cruce_recaudacion["TOTAL"].apply(
+            lambda x: "DISPONIBLE" if x > 0 else ("SIN_LINEA" if x == 0 else "SOBREGIRO"))
+        df_cruce_recaudacion["TOTAL"] = df_cruce_recaudacion["TOTAL"].apply(
+            lambda x: "{:,.2f}".format(x).replace(",", "x").replace(".", ",").replace("x", "."))
+        df_cruce_recaudacion.reset_index(drop=True, inplace=True)
+        
+        df_cruce_recaudacion["TEXTO"] = df_cruce_recaudacion.apply(self.generar_texto, axis=1)
+        self.df_cruce_recaudacion = df_cruce_recaudacion
+        self.contador += 1
     
-    def accion_boton4(self):
-        self.progressbar.start()
-        try:
-            inicio = time.time()
-            lista_nivel_1, lista_ld = self.reporte.exportar_archivos_txt()
-            fin = time.time()
-            proceso4 = fin - inicio
-            self.tiempo_proceso = round((self.proceso1 + self.proceso2 + self.proceso3 + proceso4),2)
-            tiempo_sap = round((self.fin_sap - self.inicio_sap),2)
-            self.tiempo_total = round((self.tiempo_proceso + tiempo_sap),2)
-            
-            self.entry_nivel1.configure(state="normal")
-            self.entry_nivel1.delete(0, "end")
-            self.entry_nivel1.insert(0, lista_nivel_1)
-            self.entry_nivel1.configure(state="readonly")
-            self.entry_ld.configure(state="normal")
-            self.entry_ld.delete(0, "end")
-            self.entry_ld.insert(0, lista_ld)
-            self.entry_ld.configure(state="readonly")
-            
-            self.entry_proceso.configure(state="normal")
-            self.entry_proceso.delete(0, "end")
-            self.entry_proceso.insert(0, str(self.tiempo_proceso) + " s")
-            self.entry_proceso.configure(state="readonly")
-            self.entry_total.configure(state="normal")
-            self.entry_total.delete(0, "end")
-            self.entry_total.insert(0, str(self.tiempo_total) + " s")
-            self.entry_total.configure(state="readonly")
-            # Mensajes listos
-            messagebox.showinfo("SMS C&CD", "MENSAJES LISTOS:"
-                                + "\n- LD: " + lista_ld + " destinatarios." 
-                                + "\n- Nivel 1: " + lista_nivel_1 + " destinatarios."
-                                + "\n\nTIEMPOS DE EJECUCIÓN:"
-                                + "\n- Proceso: " + str(self.tiempo_proceso) + " segundos."
-                                + "\n- SAP: " + str(tiempo_sap) + " segundos."
-                                + "\n- Total: " + str(self.tiempo_total) + " segundos.")
-            os.startfile(resource_path("./CARGAS/"))
-        except Exception as e:
-            messagebox.showerror("ERROR", "Algo salió mal. Por favor, intente nuevamente.\nDetalles: " + str(e))
-        finally:
-            self.progressbar.stop()
+    def preparar_modelo(self):
+        df_modelo = pd.read_excel(self.ruta_modelo, sheet_name="Base")
+        columnas_modelo = ["DEUDOR", "NOMBRE", "LINEA DISPONIBLE EQUIPOS RESTANTE"]
+        df_modelo = df_modelo[columnas_modelo]
+        
+        df_cruce_modelo = self.df_celulares.merge(df_modelo, left_on="DEUDOR", right_on="DEUDOR", how="inner")
+        df_cruce_modelo = df_cruce_modelo[["CELULAR", "NOMBRE_x", "LINEA DISPONIBLE EQUIPOS RESTANTE"]]
+        df_cruce_modelo = df_cruce_modelo.rename(columns={"NOMBRE_x": "NOMBRE", "LINEA DISPONIBLE EQUIPOS RESTANTE": "TOTAL"})
+        df_cruce_modelo = df_cruce_modelo.sort_values(by="TOTAL", ascending=True)
+        df_cruce_modelo["TIPO"] = df_cruce_modelo["TOTAL"].apply(
+            lambda x: "DISPONIBLE" if x > 0 else ("SIN_LINEA" if x == 0 else "SOBREGIRO"))
+        df_cruce_modelo["TOTAL"] = df_cruce_modelo["TOTAL"].apply(
+            lambda x: "{:,.2f}".format(x).replace(",", "x").replace(".", ",").replace("x", "."))
+        df_cruce_modelo.reset_index(drop=True, inplace=True)
+        
+        df_cruce_modelo["TEXTO"] = df_cruce_modelo.apply(self.generar_texto, axis=1)
+        self.df_cruce_modelo = df_cruce_modelo
+        self.contador += 1
     
-    def crear_app(self):
-        self.app = CTk()
-        self.app.title("SMS C&CD")
-        icon_path = resource_path("./icono.ico")
-        if os.path.isfile(icon_path):
-            self.app.iconbitmap(icon_path)
-        else:
-            messagebox.showwarning("ADVERTENCIA", "No se encontró el archivo 'icono.ico' en la ruta: " + icon_path)
-        self.app.resizable(False, False)
-        set_appearance_mode("light")
+    def preparar_zfir60(self):
+        df_zfir60 = pd.read_excel(self.ruta_zfir60, sheet_name="Sheet1")
+        df_zfir60 = df_zfir60[["Cliente Pa", "Total Vencida"]]
+        df_zfir60["Total Vencida"] = df_zfir60["Total Vencida"].clip(lower=0)
+        df_zfir60 = df_zfir60.groupby("Cliente Pa")["Total Vencida"].sum().reset_index()
         
-        main_frame = CTkFrame(self.app)
-        main_frame.pack_propagate("True")
-        main_frame.pack(fill="both", expand=True)
+        df_cruce_zfir60 = self.df_celulares.merge(df_zfir60, left_on="DEUDOR", right_on="Cliente Pa", how="left")
+        df_cruce_zfir60 = df_cruce_zfir60[["CELULAR", "Total Vencida"]]
+        df_cruce_zfir60 = df_cruce_zfir60[df_cruce_zfir60["Total Vencida"] != 0]
+        df_cruce_zfir60 = df_cruce_zfir60.sort_values(by="Total Vencida", ascending=False)
+        df_cruce_zfir60["Total Vencida"] = df_cruce_zfir60["Total Vencida"].apply(
+            lambda x: "{:,.2f}".format(x).replace(",", "x").replace(".", ",").replace("x", "."))
+        df_cruce_zfir60.reset_index(drop=True, inplace=True)
         
-        frame_botones = CTkFrame(main_frame)
-        frame_botones.pack(fill="both", expand=True, padx=10, pady=(10, 0))
-        
-        self.boton1 = CTkButton(frame_botones, text="Actualizar Números", font=("Calibri",12), text_color="black", 
-                                fg_color="transparent", border_color="black", border_width=2, hover_color="#d11515", 
-                                width=200, corner_radius=5, command=lambda: self.iniciar_proceso(1))
-        self.boton1.pack(fill="both", expand=True, ipady=2, padx=10, pady=(10, 0))
-        
-        self.boton2 = CTkButton(frame_botones, text="Exportar Deudores", font=("Calibri",12), text_color="black", 
-                                fg_color="transparent", border_color="black", border_width=2, hover_color="#d11515", 
-                                width=200, corner_radius=5, command=lambda: self.iniciar_proceso(2))
-        self.boton2.pack(fill="both", expand=True, ipady=2, padx=10, pady=(10, 0))
-        
-        frame_checkbox = CTkFrame(frame_botones, border_width=2, border_color="black")
-        frame_checkbox.pack(fill="both", expand=True, padx=10, pady=(10, 0))
-        
-        label_exportar = CTkLabel(frame_checkbox, text="Seleccionar formato SAP:", font=("Calibri",12,"bold"))
-        label_exportar.pack(padx=10, pady=5)
-        
-        self.var_hoja_calculo = BooleanVar()
-        self.var_hoja_calculo.set(True)
-        self.var_hoja_calculo.trace("w", lambda *args: self.var_fichero_local.set(not self.var_hoja_calculo.get()))
-        self.checkbox_hoja = CTkCheckBox(frame_checkbox, text="Hoja", font=("Calibri",12), width=5, 
-                                        border_color="#d11515", border_width=2, fg_color="#d11515", 
-                                        hover_color="#d11515", variable=self.var_hoja_calculo)
-        self.checkbox_hoja.pack(side="left", padx=(30,10), pady=(0, 10))
-        
-        self.var_fichero_local = BooleanVar()
-        self.var_fichero_local.set(False)
-        self.var_fichero_local.trace("w", lambda *args: self.var_hoja_calculo.set(not self.var_fichero_local.get()))
-        self.checkbox_fichero = CTkCheckBox(frame_checkbox, text="Fichero", font=("Calibri",12), width=5, 
-                                            border_color="#d11515", border_width=2, fg_color="#d11515", 
-                                            hover_color="#d11515", variable=self.var_fichero_local)
-        self.checkbox_fichero.pack(side="left", padx=(10,30), pady=(0, 10))
-        
-        self.boton3 = CTkButton(frame_botones, text="Preparar Bases", font=("Calibri",12), text_color="black", 
-                                fg_color="transparent", border_color="black", border_width=2, hover_color="#d11515", 
-                                width=200, corner_radius=5, command=lambda: self.iniciar_proceso(3))
-        self.boton3.pack(fill="both", expand=True, ipady=2, padx=10, pady=(10, 0))
-        
-        self.boton4 = CTkButton(frame_botones, text="Exportar TXT", font=("Calibri",12), text_color="black", 
-                                fg_color="transparent", border_color="black", border_width=2, hover_color="#d11515", 
-                                width=200, corner_radius=5, command=lambda: self.iniciar_proceso(4))
-        self.boton4.pack(fill="both", expand=True, ipady=2, padx=10, pady=(10, 0))
-        
-        self.boton_salir = CTkButton(frame_botones, text="Salir", font=("Calibri",12), text_color="black", 
-                                    fg_color="transparent", border_color="black", border_width=2, hover_color="#d11515", 
-                                    width=100, height=10, corner_radius=5, command=self.salir)
-        self.boton_salir.pack(ipady=2, padx=50, pady=10)
-        
-        frame_output = CTkFrame(main_frame)
-        frame_output.pack(fill="both", expand=True, padx=10, pady=(10, 0))
-        
-        label_nivel1 = CTkLabel(frame_output, text="Nivel 1: ", font=("Calibri",12))
-        label_nivel1.grid(row=0, column=0, padx=(25,0), pady=(5,0), sticky="e")
-        self.entry_nivel1 = Entry(frame_output, font=("Calibri",12), width=5, state="readonly")
-        self.entry_nivel1.grid(row=0, column=1, padx=(0,10), pady=(5,0), sticky="w")
-        
-        label_ld = CTkLabel(frame_output, text="LD: ", font=("Calibri",12))
-        label_ld.grid(row=1, column=0, padx=(25,0), pady=(0,5), sticky="e")
-        self.entry_ld = Entry(frame_output, font=("Calibri",12), width=5, state="readonly")
-        self.entry_ld.grid(row=1, column=1, padx=(0,10), pady=(0,5), sticky="w")
-        
-        label_proceso = CTkLabel(frame_output, text="Proceso: ", font=("Calibri",12))
-        label_proceso.grid(row=0, column=2, padx=(10,0), pady=(5,0), sticky="e")
-        self.entry_proceso = Entry(frame_output, font=("Calibri",12), width=7, state="readonly")
-        self.entry_proceso.grid(row=0, column=3, padx=(0,10), pady=(5,0), sticky="w")
-        
-        label_total = CTkLabel(frame_output, text="Total: ", font=("Calibri",12))
-        label_total.grid(row=1, column=2, padx=(10,0), pady=(0,5), sticky="e")
-        self.entry_total = Entry(frame_output, font=("Calibri",12), width=7, state="readonly")
-        self.entry_total.grid(row=1, column=3, padx=(0,10), pady=(0,5), sticky="w")
-        
-        self.progressbar = CTkProgressBar(main_frame, mode="indeterminate", orientation="horizontal", 
-                                            progress_color="#d11515", height=7, border_width=0)
-        self.progressbar.pack(fill="x", expand=True, padx=10, pady=10)
-        
-        self.app.mainloop()
+        df_cruce_zfir60["TEXTO"] = df_cruce_zfir60.apply(self.generar_texto, axis=1)
+        self.df_cruce_zfir60 = df_cruce_zfir60
+        self.contador = 0
     
-    def generar_reporte(self):
-        try:
-            self.reporte = SMS
-            self.crear_app()
-        except Exception as e:
-            messagebox.showerror(
-                "ERROR", 
-                "Algo salió mal. Por favor, intente nuevamente.\n\nDetalles: " + str(e) + 
-                "\n\nAsegúrese de tener el archivo 'RUTAS.xlsx' en la misma carpeta que el ejecutable.")
-
-
-def main():
-    app = App_SMS()
-    app.generar_reporte()
-
-if __name__ == "__main__":
-    main()
+    def return_resultados(self):
+        resultados = [self.df_cruce_modelo.shape[0], self.df_cruce_recaudacion.shape[0], self.df_cruce_zfir60.shape[0]]
+        return resultados
+    
+    def exportar_archivos_txt(self):
+        # Nivel 1
+        lista_nivel_1 = self.df_cruce_zfir60["TEXTO"].to_list()
+        with open(self.nivel_1_txt, "w") as f:
+            for item in lista_nivel_1:
+                f.write("%s\n" % item)
+        # LD
+        df_ld = pd.concat([self.df_cruce_modelo, self.df_cruce_recaudacion], ignore_index=True)
+        lista_ld = df_ld["TEXTO"].to_list()
+        with open(self.ld_txt, "w") as f:
+            for item in lista_ld:
+                f.write("%s\n" % item)
+        # Resultados
+        return str(len(lista_nivel_1)), str(len(lista_ld))

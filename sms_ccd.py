@@ -3,7 +3,7 @@ from resource_path import *
 import pandas as pd
 
 
-class SMS:
+class SMS_CCD:
     def __init__(self):
         self.rutas_path = resource_path("./RUTAS.xlsx")
         df_rutas = pd.read_excel(self.rutas_path, sheet_name="RUTAS")

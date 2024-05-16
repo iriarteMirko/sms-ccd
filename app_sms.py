@@ -1,13 +1,11 @@
-from sms_ccd import resource_path, SMS
+from sms_ccd import SMS_CCD
 from tkinter import messagebox, Entry
 from customtkinter import CTk, CTkFrame, CTkButton, CTkCheckBox, CTkLabel, CTkProgressBar
-from customtkinter import set_appearance_mode, BooleanVar, os
-import warnings
+from customtkinter import set_appearance_mode, BooleanVar
+from resource_path import *
 import threading
 import time
 
-
-warnings.filterwarnings("ignore")
 
 class App_SMS():
     def salir(self):
@@ -251,7 +249,7 @@ class App_SMS():
     
     def generar_reporte(self):
         try:
-            self.reporte = SMS
+            self.reporte = SMS_CCD
             self.crear_app()
         except Exception as e:
             messagebox.showerror(

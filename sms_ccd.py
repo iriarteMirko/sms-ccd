@@ -1,16 +1,14 @@
-from clase_sms_ccd import Clase_SMS
-from datetime import datetime, timedelta
+from clase_sms_ccd import resource_path, SMS
 from tkinter import messagebox, Entry
-from customtkinter import *
-from resource_path import *
-import pandas as pd
+from customtkinter import CTk, CTkFrame, CTkButton, CTkCheckBox, CTkLabel, CTkProgressBar
+from customtkinter import set_appearance_mode, BooleanVar, os
 import warnings
 import threading
 import time
 
 warnings.filterwarnings("ignore")
 
-class App_SMS():    
+class App_SMS():
     def salir(self):
         self.app.destroy()
     
@@ -156,28 +154,10 @@ class App_SMS():
         finally:
             self.progressbar.stop()
     
-    def generar_reporte(self):
-        try:
-            excel_rutas = resource_path("./RUTAS.xlsx")
-            df_rutas = pd.read_excel(excel_rutas)
-            fecha_hoy = datetime.today()
-            fecha_ayer = fecha_hoy - timedelta(days=1)
-            fecha_ayer = fecha_ayer.strftime("%Y%m%d")
-            fecha_hoy = datetime.today().strftime("%Y%m%d")
-            fecha_hoy_txt = datetime.today().strftime("%d.%m.%Y")
-            ruta_zfir60 = df_rutas["RUTA"][0]
-            ruta_modelo = df_rutas["RUTA"][1]
-            ruta_dacxanalista = df_rutas["RUTA"][2]
-            self.reporte = Clase_SMS(fecha_hoy, fecha_ayer, fecha_hoy_txt, ruta_zfir60, ruta_modelo, ruta_dacxanalista)
-        except Exception as e:
-            messagebox.showerror("ERROR", "Algo salió mal. Por favor, intente nuevamente.\n\nDetalles: " + str(e)
-                                + "\n\nAsegúrese de tener el archivo 'RUTAS.xlsx' en la misma carpeta que el ejecutable.")
-            self.app.destroy()
-    
-    def crear_app(self):        
+    def crear_app(self):
         self.app = CTk()
         self.app.title("SMS C&CD")
-        icon_path = resource_path("./images/sms.ico")
+        icon_path = resource_path("./icono.ico")
         if os.path.isfile(icon_path):
             self.app.iconbitmap(icon_path)
         else:
@@ -267,11 +247,21 @@ class App_SMS():
         self.progressbar.pack(fill="x", expand=True, padx=10, pady=10)
         
         self.app.mainloop()
+    
+    def generar_reporte(self):
+        try:
+            self.reporte = SMS
+            self.crear_app()
+        except Exception as e:
+            messagebox.showerror(
+                "ERROR", 
+                "Algo salió mal. Por favor, intente nuevamente.\n\nDetalles: " + str(e) + 
+                "\n\nAsegúrese de tener el archivo 'RUTAS.xlsx' en la misma carpeta que el ejecutable.")
+
 
 def main():
     app = App_SMS()
     app.generar_reporte()
-    app.crear_app()
 
 if __name__ == "__main__":
     main()

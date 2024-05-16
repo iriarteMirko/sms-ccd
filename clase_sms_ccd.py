@@ -1,24 +1,29 @@
+from datetime import datetime, timedelta
 from resource_path import *
 import pandas as pd
 
-class Clase_SMS:
-    def __init__(self, fecha_hoy, fecha_ayer, fecha_hoy_txt, ruta_zfir60, ruta_modelo, ruta_dacxanalista):
-        self.fecha_hoy = fecha_hoy
-        self.fecha_ayer = fecha_ayer
-        self.fecha_hoy_txt = fecha_hoy_txt
+class SMS:
+    def __init__(self):
+        self.rutas_path = resource_path("./RUTAS.xlsx")
+        df_rutas = pd.read_excel(self.rutas_path, sheet_name="RUTAS")
         
-        self.ruta_dacxanalista = ruta_dacxanalista + "/Nuevo_DACxANALISTA.xlsx"
-        self.ruta_zfir60 = ruta_zfir60 + "/ZFIR60_" + self.fecha_hoy + ".xlsx"
-        self.ruta_modelo = ruta_modelo + "/Modelo de Evaluación de Pedidos de Equipos_" + self.fecha_hoy + ".xlsx"
+        fecha_hoy = datetime.today()
+        fecha_ayer = fecha_hoy - timedelta(days=1)
+        self.fecha_ayer = fecha_ayer.strftime("%Y%m%d")
+        self.fecha_hoy = fecha_hoy.strftime("%Y%m%d")
+        self.fecha_hoy_txt = datetime.today().strftime("%d.%m.%Y")
         
-        self.ruta_base_celulares = "./BASES/Base_Celulares_CCD.xlsx"
-        self.fbl5n_hoja = "./BASES/FBL5N_HOJA.xlsx"
-        self.fbl5n_fichero = "./BASES/FBL5N_FICHERO.xlsx"
-        self.reporte_recaudacion = "./BASES/Reporte_Recaudacion_" + self.fecha_hoy + ".csv"
-        self.deudores = "./BASES/Deudores.xlsx"
+        self.ruta_zfir60 = df_rutas["RUTA"][0] + "ZFIR60_"+self.fecha_hoy+".xlsx"
+        self.ruta_modelo = df_rutas["RUTA"][1] + "Modelo de Evaluación de Pedidos de Equipos_"+self.fecha_hoy+".xlsx"
+        self.ruta_dacxanalista = df_rutas["RUTA"][2]
+        self.reporte_recaudacion = df_rutas["RUTAS"][3] + "Reporte_Recaudacion_"+self.fecha_hoy+".csv"
+        self.ruta_base_celulares = df_rutas["RUTA"][4]
+        self.fbl5n_hoja = df_rutas["RUTA"][5]
+        self.fbl5n_fichero = df_rutas["RUTA"][6]
+        self.deudores = df_rutas["RUTA"][7]
         
-        self.ld_txt = "./CARGAS/LD " + self.fecha_hoy_txt + ".txt"
-        self.nivel_1_txt = "./CARGAS/Nivel 1 " + self.fecha_hoy_txt + ".txt"
+        self.ld_txt = df_rutas["RUTAS"][8] + "LD "+self.fecha_hoy_txt+".txt"
+        self.nivel_1_txt = df_rutas["RUTAS"][9] + "Nivel 1 "+self.fecha_hoy_txt+".txt"
         
         self.contador = 0
     
@@ -28,8 +33,9 @@ class Clase_SMS:
     def actualizar_base_celulares(self):
         df_base_celulares = pd.read_excel(self.ruta_base_celulares)
         df_dacxanalista = pd.read_excel(self.ruta_dacxanalista, sheet_name="Base_NUEVA")
+        df_dac_tipos = pd.read_excel(self.rutas_path, sheet_name="DACS")
+        lista_tipo_dac_no_validos = df_dac_tipos["TIPOS_NO_VALIDOS"].to_list()
         columnas_requeridas = ["DEUDOR", "NOMBRE", "REGION", "ANALISTA_ACT", "TIPO_DAC", "ESTADO"]
-        lista_tipo_dac_no_validos = ["PVA", "TARJETERO", "RED", "RECARGA FFVV", "PROVEEDOR", "CROSSBORDER", "CDR", "CACE", "AGENTE TELMEX", "AGENTE TELMEX  / RED", "DAC RURAL"]
         df_dacxanalista = df_dacxanalista[columnas_requeridas]
         df_dacxanalista = df_dacxanalista[~df_dacxanalista["TIPO_DAC"].isin(lista_tipo_dac_no_validos)]
         df_dacxanalista = df_dacxanalista[df_dacxanalista["ESTADO"].isin(["OPERATIVO CON MOVIMIENTO", "OPERATIVO SIN MOVIMIENTO"])]
@@ -73,22 +79,23 @@ class Clase_SMS:
         return resultados
     
     def generar_texto(self, row):
+        df_texto = pd.read_excel(self.rutas_path, sheet_name="TEXTO")
         if self.contador == 0:
             if row["TIPO"] == "DISPONIBLE":
-                return f'51{row["CELULAR"]},Text,"Estimado Socio {row["NOMBRE"]}, le informamos que su Linea Disponible en RECAUDACION es S/{row["TOTAL"]}, puede realizar su pedido hasta este importe. Creditos y Cobranzas le desea un excelente dia."'
+                return f'51{row["CELULAR"]}{df_texto["TEXTO_1"][0]}{row["NOMBRE"]}{df_texto["TEXTO_2"][0]}{row["TOTAL"]}{df_texto["TEXTO_3"][0]}'
             elif row["TIPO"] == "SOBREGIRO":
-                return f'51{row["CELULAR"]},Text,"Estimado Socio {row["NOMBRE"]}, le informamos que el dia de hoy cuenta con sobregiro en RECAUDACION de S/{row["TOTAL"]}. Para mayor informacion contacte a su analista de C&CD."'
+                return f'51{row["CELULAR"]}{df_texto["TEXTO_1"][1]}{row["NOMBRE"]}{df_texto["TEXTO_2"][1]}{row["TOTAL"]}{df_texto["TEXTO_3"][1]}'
             elif row["TIPO"] == "SIN_LINEA":
-                return f'51{row["CELULAR"]},Text,"Estimado Socio {row["NOMBRE"]}, le informamos que el día de hoy no cuenta con Linea Disponible en RECAUDACION. Para mayor informacion contacte a su analista de C&CD."'
+                return f'51{row["CELULAR"]}{df_texto["TEXTO_1"][2]}{row["NOMBRE"]}{df_texto["TEXTO_2"][2]}'
         elif self.contador == 1:
             if row["TIPO"] == "DISPONIBLE":
-                return f'51{row["CELULAR"]},Text,"Estimado Socio {row["NOMBRE"]}, le informamos que su Linea Disponible de Equipos de hoy es S/{row["TOTAL"]}, puede realizar pedidos de equipos valorizados a precio prepago hasta este importe, sujeto a evaluacion crediticia. Creditos y Cobranzas le desea un excelente dia."'
+                return f'51{row["CELULAR"]}{df_texto["TEXTO_1"][3]}{row["NOMBRE"]}{df_texto["TEXTO_2"][3]}{row["TOTAL"]}{df_texto["TEXTO_3"][3]}'
             elif row["TIPO"] == "SOBREGIRO":
-                return f'51{row["CELULAR"]},Text,"Estimado Socio {row["NOMBRE"]}, le informamos que el dia de hoy cuenta con sobregiro en Linea Disponible para compra de Equipos de S/{row["TOTAL"]}. Para mas informacion contacte a su analista. Creditos y Cobranzas le desea un excelente dia."'
+                return f'51{row["CELULAR"]}{df_texto["TEXTO_1"][4]}{row["NOMBRE"]}{df_texto["TEXTO_2"][4]}{row["TOTAL"]}{df_texto["TEXTO_3"][4]}'
             elif row["TIPO"] == "SIN_LINEA":
-                return f'51{row["CELULAR"]},Text,"Estimado Socio {row["NOMBRE"]}, le informamos que el dia de hoy no cuenta con Linea Disponible para compra de Equipos. Para mas informacion contacte a su analista. Creditos y Cobranzas le desea un excelente dia."'
+                return f'51{row["CELULAR"]}{df_texto["TEXTO_1"][5]}{row["NOMBRE"]}{df_texto["TEXTO_2"][5]}'
         else:
-            return f'51{row["CELULAR"]},Text,"Estimado Socio: Le informamos que tiene una deuda vencida de S/{row["Total Vencida"]}, puede pagarla desde la Web y App de bancos principales. Mayor informacion en el Portal de Canales: https://portaldistribuidores.claro.com.pe. Creditos y Cobranzas Distribuidores."'
+            return f'51{row["CELULAR"]}{df_texto["TEXTO_1"][6]}{row["Total Vencida"]}{df_texto["TEXTO_2"][5]}'
     
     def exportar_deudores(self):
         df_recaudacion = pd.read_csv(self.reporte_recaudacion, encoding="latin1")

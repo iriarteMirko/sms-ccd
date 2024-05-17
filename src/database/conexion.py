@@ -25,3 +25,12 @@ def ejecutar_query(query, parametros=None):
     finally:
         cursor.close()
         conexion.close
+
+def get_ruta(ruta):
+    try:
+        query = "SELECT RUTA FROM RUTAS WHERE NOMBRE = ?"
+        parametros = (ruta,)
+        return ejecutar_query(query, parametros)
+    except sql.Error as ex:
+        error = "Error al obtener la ruta:" + str(ex)
+        return error

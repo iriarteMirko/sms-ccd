@@ -1,4 +1,5 @@
 from .sms_ccd import SMS_CCD
+from ..database.conexion import get_ruta
 from ..utils.resource_path import *
 from tkinter import messagebox, Entry
 from customtkinter import *

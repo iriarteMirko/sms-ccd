@@ -1,12 +1,3 @@
-# Ignorar archivos:
-*.xlsx
-*.xls
-*.xlsm
-*.docx
-*.csv
-CARGAS/
-BASES/
-
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

@@ -51,6 +51,7 @@ class App_SMS():
     
     def accion_boton1(self):
         self.progressbar.start()
+        self.rutas = verificar_rutas()
         self.reporte = SMS_CCD(self.rutas)
         try:
             inicio = time.time()
@@ -152,68 +153,72 @@ class App_SMS():
         finally:
             self.progressbar.stop()
     
+    def confirmar_configuracion(self):
+        self.rutas = verificar_rutas()
+        self.ventana_config.destroy()
+    
     def configuracion(self):
-        ventana_config =CTkToplevel(self.app)
-        ventana_config.title("Rutas")
-        ventana_config.resizable(False, False)
-        ventana_config.grab_set()
-        ventana_config.focus_set()
+        self.ventana_config =CTkToplevel(self.app)
+        self.ventana_config.title("Rutas")
+        self.ventana_config.resizable(False, False)
+        self.ventana_config.grab_set()
+        self.ventana_config.focus_set()
         
-        titulo1 = CTkLabel(ventana_config, text="Seleccionar Archivos", font=("Calibri",12,"bold"))
+        titulo1 = CTkLabel(self.ventana_config, text="Seleccionar Archivos", font=("Calibri",12,"bold"))
         titulo1.pack(fill="both", expand=True, padx=10, pady=0)
         
-        frame_botones1 = CTkFrame(ventana_config)
+        frame_botones1 = CTkFrame(self.ventana_config)
         frame_botones1.pack_propagate("True")
         frame_botones1.pack(fill="both", expand=True, padx=10, pady=0)
         
         file_dacxanalista = CTkButton(
             frame_botones1, text="DACxANALISTA", font=("Calibri",12), text_color="black",
             fg_color="transparent", border_color="black", border_width=2, hover_color="#d11515",
-            width=100, corner_radius=5)
+            width=100, corner_radius=5, command=lambda: seleccionar_archivo("DACxANALISTA"))
         file_dacxanalista.grid(row=0, column=0, ipady=2, padx=10, pady=10, sticky="nsew")
         
         file_celulares = CTkButton(
             frame_botones1, text="Base Celulares", font=("Calibri",12), text_color="black",
             fg_color="transparent", border_color="black", border_width=2, hover_color="#d11515",
-            width=100, corner_radius=5)
+            width=100, corner_radius=5, command=lambda: seleccionar_archivo("CELULARES"))
         file_celulares.grid(row=0, column=1, ipady=2, padx=(0,10), pady=10, sticky="nsew")
         
-        titulo2 = CTkLabel(ventana_config, text="Seleccionar Carpetas", font=("Calibri",12,"bold"))
+        titulo2 = CTkLabel(self.ventana_config, text="Seleccionar Carpetas", font=("Calibri",12,"bold"))
         titulo2.pack(fill="both", expand=True, padx=10, pady=0)
         
-        frame_botones2 = CTkFrame(ventana_config)
+        frame_botones2 = CTkFrame(self.ventana_config)
         frame_botones2.pack_propagate("True")
         frame_botones2.pack(fill="both", expand=True, padx=10, pady=(0,10))
         
         folder_modelo = CTkButton(
             frame_botones2, text="Carpeta Modelo", font=("Calibri",12), text_color="black", 
             fg_color="transparent", border_color="black", border_width=2, hover_color="#d11515", 
-            width=100, corner_radius=5)
+            width=100, corner_radius=5, command=lambda: seleccionar_carpeta("MODELO"))
         folder_modelo.grid(row=0, column=0, ipady=2, padx=10, pady=10, sticky="nsew")
         
         folder_zfir = CTkButton(
             frame_botones2, text="Carpeta ZFIR60", font=("Calibri",12), text_color="black",
             fg_color="transparent", border_color="black", border_width=2, hover_color="#d11515",
-            width=100, corner_radius=5)
+            width=100, corner_radius=5, command=lambda: seleccionar_carpeta("ZFIR"))
         folder_zfir.grid(row=0, column=1, ipady=2, padx=(0,10), pady=10, sticky="nsew")
         
         folder_bases = CTkButton(
             frame_botones2, text="Carpeta Bases", font=("Calibri",12), text_color="black",
             fg_color="transparent", border_color="black", border_width=2, hover_color="#d11515",
-            width=100, corner_radius=5)
+            width=100, corner_radius=5, command=lambda: seleccionar_carpeta("BASES"))
         folder_bases.grid(row=1, column=0, ipady=2, padx=10, pady=10, sticky="nsew")
         
         folder_cargas = CTkButton(
             frame_botones2, text="Carpeta Cargas", font=("Calibri",12), text_color="black",
             fg_color="transparent", border_color="black", border_width=2, hover_color="#d11515",
-            width=100, corner_radius=5)
+            width=100, corner_radius=5, command=lambda: seleccionar_carpeta("CARGAS"))
         folder_cargas.grid(row=1, column=1, ipady=2, padx=(0,10), pady=10, sticky="nsew")
         
-        boton_volver = CTkButton(
-            ventana_config, text="Volver", font=("Calibri",12), text_color="black",
+        boton_confirmar = CTkButton(
+            self.ventana_config, text="Confirmar", font=("Calibri",12), text_color="black",
             fg_color="transparent", border_color="black", border_width=2, hover_color="#d11515",
-            width=100, height=10, corner_radius=5, command=ventana_config.destroy)
-        boton_volver.pack(ipady=2, padx=10, pady=(0,10))
+            width=100, height=10, corner_radius=5, command=self.confirmar_configuracion)
+        boton_confirmar.pack(ipady=2, padx=10, pady=(0,10))
     
     def crear_app(self):
         self.app = CTk()
@@ -321,6 +326,5 @@ class App_SMS():
     def generar_reporte(self):
         try:
             self.crear_app()
-            self.rutas = verificar_rutas()
         except Exception as ex:
             messagebox.showerror("ERROR", "Algo salió mal. Por favor, intente nuevamente.\n\nDetalles: " + str(ex))

@@ -4,9 +4,8 @@ import pandas as pd
 
 
 class SMS_CCD():
-    def __init__(self,rutas):
-        self.rutas_path = resource_path("src/utils/RUTAS.xlsx")
-        df_rutas = pd.read_excel(self.rutas_path, sheet_name="RUTAS")
+    def __init__(self, rutas):
+        self.regla_path = resource_path("src/utils/REGLA.xlsx")
         
         fecha_hoy = datetime.today()
         fecha_ayer = fecha_hoy - timedelta(days=1)
@@ -14,17 +13,22 @@ class SMS_CCD():
         self.fecha_hoy = fecha_hoy.strftime("%Y%m%d")
         self.fecha_hoy_txt = datetime.today().strftime("%d.%m.%Y")
         
-        self.ruta_zfir60 = df_rutas["RUTA"][0] + "ZFIR60_"+self.fecha_hoy+".xlsx"
-        self.ruta_modelo = df_rutas["RUTA"][1] + "Modelo de Evaluación de Pedidos de Equipos_"+self.fecha_hoy+".xlsx"
-        self.ruta_dacxanalista = df_rutas["RUTA"][2]
-        self.reporte_recaudacion = df_rutas["RUTA"][3] + "Reporte_Recaudacion_"+self.fecha_hoy+".csv"
-        self.ruta_base_celulares = df_rutas["RUTA"][4]
-        self.fbl5n_hoja = df_rutas["RUTA"][5]
-        self.fbl5n_fichero = df_rutas["RUTA"][6]
-        self.deudores = df_rutas["RUTA"][7]
+        self.ruta_dacxanalista = rutas[0]
+        self.ruta_base_celulares = rutas[1]
         
-        self.ld_txt = df_rutas["RUTA"][8] + "LD "+self.fecha_hoy_txt+".txt"
-        self.nivel_1_txt = df_rutas["RUTA"][8] + "Nivel 1 "+self.fecha_hoy_txt+".txt"
+        self.ruta_modelo = rutas[2] + "Modelo de Evaluación de Pedidos de Equipos_"+self.fecha_hoy+".xlsx"
+        self.ruta_zfir60 = rutas[3] + "ZFIR60_"+self.fecha_hoy+".xlsx"
+        
+        bases = rutas[4]
+        cargas = rutas[5]
+        
+        self.reporte_recaudacion = bases + "Reporte_Recaudacion_"+self.fecha_hoy+".csv"
+        self.fbl5n_hoja = bases
+        self.fbl5n_fichero = bases
+        self.deudores = bases
+        
+        self.ld_txt = cargas + "LD "+self.fecha_hoy_txt+".txt"
+        self.nivel_1_txt = cargas + "Nivel 1 "+self.fecha_hoy_txt+".txt"
         
         self.contador = 0
     
@@ -34,7 +38,7 @@ class SMS_CCD():
     def actualizar_base_celulares(self):
         df_base_celulares = pd.read_excel(self.ruta_base_celulares)
         df_dacxanalista = pd.read_excel(self.ruta_dacxanalista, sheet_name="Base_NUEVA")
-        df_dac_tipos = pd.read_excel(self.rutas_path, sheet_name="DACS")
+        df_dac_tipos = pd.read_excel(self.regla_path, sheet_name="NO_VALIDOS")
         lista_tipo_dac_no_validos = df_dac_tipos["TIPOS_NO_VALIDOS"].to_list()
         columnas_requeridas = ["DEUDOR", "NOMBRE", "REGION", "ANALISTA_ACT", "TIPO_DAC", "ESTADO"]
         df_dacxanalista = df_dacxanalista[columnas_requeridas]
@@ -80,7 +84,7 @@ class SMS_CCD():
         return resultados
     
     def generar_texto(self, row):
-        df_texto = pd.read_excel(self.rutas_path, sheet_name="TEXTO")
+        df_texto = pd.read_excel(self.regla_path, sheet_name="TEXTO")
         if self.contador == 0:
             if row["TIPO"] == "DISPONIBLE":
                 return f'51{row["CELULAR"]}{df_texto["TEXTO_1"][0]}{row["NOMBRE"]}{df_texto["TEXTO_2"][0]}{row["TOTAL"]}{df_texto["TEXTO_3"][0]}'

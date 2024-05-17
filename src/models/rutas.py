@@ -16,9 +16,9 @@ def verificar_rutas():
             rutas_general.append(ruta[1])
         if len(rutas_vacias) != 0:
             messagebox.showwarning(
-                "Advertencia", 
-                "Las siguientes rutas no han sido seleccionadas:\n" 
-                + "\n".join(rutas_vacias) 
+                "ADVERTENCIA", 
+                "Las siguientes rutas no han sido seleccionadas:" 
+                + "\n("+", ".join(rutas_vacias)+")\n"
                 + "\nPor favor seleccione las rutas faltantes.")
             return rutas_general
         else:

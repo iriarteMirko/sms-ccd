@@ -1,5 +1,5 @@
 from .sms_ccd import SMS_CCD
-from ..database.conexion import get_ruta
+from .rutas import *
 from ..utils.resource_path import *
 from tkinter import messagebox, Entry
 from customtkinter import *
@@ -51,6 +51,7 @@ class App_SMS():
     
     def accion_boton1(self):
         self.progressbar.start()
+        self.reporte = SMS_CCD(self.rutas)
         try:
             inicio = time.time()
             resultados = self.reporte.actualizar_base_celulares()
@@ -319,10 +320,7 @@ class App_SMS():
     
     def generar_reporte(self):
         try:
-            self.reporte = SMS_CCD()
             self.crear_app()
-        except Exception as e:
-            messagebox.showerror(
-                "ERROR", 
-                "Algo salió mal. Por favor, intente nuevamente.\n\nDetalles: " + str(e) + 
-                "\n\nAsegúrese de tener el archivo 'RUTAS.xlsx' en la misma carpeta que el ejecutable.")
+            self.rutas = verificar_rutas()
+        except Exception as ex:
+            messagebox.showerror("ERROR", "Algo salió mal. Por favor, intente nuevamente.\n\nDetalles: " + str(ex))

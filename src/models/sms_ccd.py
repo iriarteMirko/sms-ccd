@@ -4,7 +4,7 @@ import pandas as pd
 
 
 class SMS_CCD():
-    def __init__(self):
+    def __init__(self,rutas):
         self.rutas_path = resource_path("src/utils/RUTAS.xlsx")
         df_rutas = pd.read_excel(self.rutas_path, sheet_name="RUTAS")
         

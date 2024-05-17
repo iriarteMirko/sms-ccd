@@ -7,9 +7,6 @@ import time
 
 
 class App_SMS():
-    def salir(self):
-        self.app.destroy()
-    
     def deshabilitar_botones(self):
         self.boton1.configure(state="disabled")
         self.boton2.configure(state="disabled")
@@ -18,6 +15,7 @@ class App_SMS():
         self.boton3.configure(state="disabled")
         self.boton4.configure(state="disabled")
         self.boton_salir.configure(state="disabled")
+        self.boton_config.configure(state="disabled")
     
     def habilitar_botones(self):
         self.boton1.configure(state="normal")
@@ -27,6 +25,7 @@ class App_SMS():
         self.boton3.configure(state="normal")
         self.boton4.configure(state="normal")
         self.boton_salir.configure(state="normal")
+        self.boton_config.configure(state="normal")
     
     def verificar_thread(self, thread):
         if thread.is_alive():
@@ -154,7 +153,6 @@ class App_SMS():
     def configuracion(self):
         ventana_config =CTkToplevel(self.app)
         ventana_config.title("Rutas")
-        ventana_config.iconbitmap(self.icon_path)
         ventana_config.resizable(False, False)
         ventana_config.grab_set()
         ventana_config.focus_set()
@@ -284,7 +282,7 @@ class App_SMS():
         self.boton_salir = CTkButton(
             frame_botones, text="Salir", font=("Calibri",12), text_color="black", 
             fg_color="transparent", border_color="black", border_width=2, hover_color="#d11515", 
-            width=100, height=10, corner_radius=5, command=self.salir)
+            width=100, height=10, corner_radius=5, command=self.app.destroy)
         self.boton_salir.pack(ipady=2, padx=50, pady=10)
         
         frame_output = CTkFrame(main_frame)
@@ -308,8 +306,8 @@ class App_SMS():
         self.boton_config = CTkButton(
             frame_output, text="Configurar Rutas", font=("Calibri", 12), text_color="black", 
             fg_color="transparent", border_color="black", border_width=2, hover_color="#d11515", 
-            width=25, corner_radius=5, command=self.configuracion)
-        self.boton_config.grid(row=1, rowspan=2, column=2, columnspan=2, padx=(10,10), pady=5, sticky="ns")
+            width=25, height=10, corner_radius=5, command=self.configuracion)
+        self.boton_config.grid(row=1, rowspan=2, column=2, columnspan=2, ipady=2, padx=(10,10), pady=5, sticky="ns")
         
         self.progressbar = CTkProgressBar(
             main_frame, mode="indeterminate", orientation="horizontal", 

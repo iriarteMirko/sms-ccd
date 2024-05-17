@@ -3,7 +3,7 @@ from resource_path import *
 import pandas as pd
 
 
-class SMS_CCD:
+class SMS_CCD():
     def __init__(self):
         self.rutas_path = resource_path("./RUTAS.xlsx")
         df_rutas = pd.read_excel(self.rutas_path, sheet_name="RUTAS")
@@ -17,14 +17,14 @@ class SMS_CCD:
         self.ruta_zfir60 = df_rutas["RUTA"][0] + "ZFIR60_"+self.fecha_hoy+".xlsx"
         self.ruta_modelo = df_rutas["RUTA"][1] + "Modelo de Evaluación de Pedidos de Equipos_"+self.fecha_hoy+".xlsx"
         self.ruta_dacxanalista = df_rutas["RUTA"][2]
-        self.reporte_recaudacion = df_rutas["RUTAS"][3] + "Reporte_Recaudacion_"+self.fecha_hoy+".csv"
+        self.reporte_recaudacion = df_rutas["RUTA"][3] + "Reporte_Recaudacion_"+self.fecha_hoy+".csv"
         self.ruta_base_celulares = df_rutas["RUTA"][4]
         self.fbl5n_hoja = df_rutas["RUTA"][5]
         self.fbl5n_fichero = df_rutas["RUTA"][6]
         self.deudores = df_rutas["RUTA"][7]
         
-        self.ld_txt = df_rutas["RUTAS"][8] + "LD "+self.fecha_hoy_txt+".txt"
-        self.nivel_1_txt = df_rutas["RUTAS"][9] + "Nivel 1 "+self.fecha_hoy_txt+".txt"
+        self.ld_txt = df_rutas["RUTA"][8] + "LD "+self.fecha_hoy_txt+".txt"
+        self.nivel_1_txt = df_rutas["RUTA"][8] + "Nivel 1 "+self.fecha_hoy_txt+".txt"
         
         self.contador = 0
     

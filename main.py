@@ -2,6 +2,8 @@ from app_sms import App_SMS
 
 
 def main():
+    import warnings
+    warnings.filterwarnings("ignore")
     app = App_SMS()
     app.generar_reporte()
 

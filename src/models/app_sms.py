@@ -147,7 +147,7 @@ class App_SMS():
                 + "\n- Proceso: " + str(self.tiempo_proceso) + " segundos."
                 + "\n- SAP: " + str(tiempo_sap) + " segundos."
                 + "\n- Total: " + str(self.tiempo_total) + " segundos.")
-            os.startfile(resource_path("./CARGAS/"))
+            os.startfile(self.rutas[5])
         except Exception as e:
             messagebox.showerror("ERROR", "Algo salió mal. Por favor, intente nuevamente.\nDetalles: " + str(e))
         finally:
@@ -174,7 +174,7 @@ class App_SMS():
         file_dacxanalista = CTkButton(
             frame_botones1, text="DACxANALISTA", font=("Calibri",12), text_color="black",
             fg_color="transparent", border_color="black", border_width=2, hover_color="#d11515",
-            width=100, corner_radius=5, command=lambda: seleccionar_archivo("DACxANALISTA"))
+            width=100, corner_radius=5, command=lambda: seleccionar_archivo("DACXANALISTA"))
         file_dacxanalista.grid(row=0, column=0, padx=10, pady=10, sticky="nsew")
         
         file_celulares = CTkButton(

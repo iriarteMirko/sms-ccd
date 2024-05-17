@@ -16,19 +16,19 @@ class SMS_CCD():
         self.ruta_dacxanalista = rutas[0]
         self.ruta_base_celulares = rutas[1]
         
-        self.ruta_modelo = rutas[2] + "Modelo de Evaluación de Pedidos de Equipos_"+self.fecha_hoy+".xlsx"
-        self.ruta_zfir60 = rutas[3] + "ZFIR60_"+self.fecha_hoy+".xlsx"
+        self.ruta_modelo = rutas[2] + "/Modelo de Evaluación de Pedidos de Equipos_"+self.fecha_hoy+".xlsx"
+        self.ruta_zfir60 = rutas[3] + "/ZFIR60_"+self.fecha_hoy+".xlsx"
         
         bases = rutas[4]
         cargas = rutas[5]
         
-        self.reporte_recaudacion = bases + "Reporte_Recaudacion_"+self.fecha_hoy+".csv"
-        self.fbl5n_hoja = bases
-        self.fbl5n_fichero = bases
-        self.deudores = bases
+        self.reporte_recaudacion = bases + "/Reporte_Recaudacion_"+self.fecha_hoy+".csv"
+        self.fbl5n_hoja = bases + "/FBL5N_HOJA.xlsx"
+        self.fbl5n_fichero = bases + "/FBL5N_FICHERO.xlsx"
+        self.deudores = bases + "/Deudores.xlsx"
         
-        self.ld_txt = cargas + "LD "+self.fecha_hoy_txt+".txt"
-        self.nivel_1_txt = cargas + "Nivel 1 "+self.fecha_hoy_txt+".txt"
+        self.ld_txt = cargas + "/LD "+self.fecha_hoy_txt+".txt"
+        self.nivel_1_txt = cargas + "/Nivel 1 "+self.fecha_hoy_txt+".txt"
         
         self.contador = 0
     

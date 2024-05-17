@@ -1,7 +1,6 @@
 from sms_ccd import SMS_CCD
 from tkinter import messagebox, Entry
-from customtkinter import CTk, CTkFrame, CTkButton, CTkCheckBox, CTkLabel, CTkProgressBar
-from customtkinter import set_appearance_mode, BooleanVar
+from customtkinter import *
 from resource_path import *
 import threading
 import time
@@ -152,14 +151,78 @@ class App_SMS():
         finally:
             self.progressbar.stop()
     
+    def configuracion(self):
+        ventana_config =CTkToplevel(self.app)
+        ventana_config.title("Rutas")
+        ventana_config.iconbitmap(self.icon_path)
+        ventana_config.resizable(False, False)
+        ventana_config.grab_set()
+        ventana_config.focus_set()
+        
+        titulo1 = CTkLabel(ventana_config, text="Seleccionar Archivos", font=("Calibri",12,"bold"))
+        titulo1.pack(fill="both", expand=True, padx=10, pady=0)
+        
+        frame_botones1 = CTkFrame(ventana_config)
+        frame_botones1.pack_propagate("True")
+        frame_botones1.pack(fill="both", expand=True, padx=10, pady=0)
+        
+        file_dacxanalista = CTkButton(
+            frame_botones1, text="DACxANALISTA", font=("Calibri",12), text_color="black",
+            fg_color="transparent", border_color="black", border_width=2, hover_color="#d11515",
+            width=100, corner_radius=5)
+        file_dacxanalista.grid(row=0, column=0, ipady=2, padx=10, pady=10, sticky="nsew")
+        
+        file_celulares = CTkButton(
+            frame_botones1, text="Base Celulares", font=("Calibri",12), text_color="black",
+            fg_color="transparent", border_color="black", border_width=2, hover_color="#d11515",
+            width=100, corner_radius=5)
+        file_celulares.grid(row=0, column=1, ipady=2, padx=(0,10), pady=10, sticky="nsew")
+        
+        titulo2 = CTkLabel(ventana_config, text="Seleccionar Carpetas", font=("Calibri",12,"bold"))
+        titulo2.pack(fill="both", expand=True, padx=10, pady=0)
+        
+        frame_botones2 = CTkFrame(ventana_config)
+        frame_botones2.pack_propagate("True")
+        frame_botones2.pack(fill="both", expand=True, padx=10, pady=(0,10))
+        
+        folder_modelo = CTkButton(
+            frame_botones2, text="Carpeta Modelo", font=("Calibri",12), text_color="black", 
+            fg_color="transparent", border_color="black", border_width=2, hover_color="#d11515", 
+            width=100, corner_radius=5)
+        folder_modelo.grid(row=0, column=0, ipady=2, padx=10, pady=10, sticky="nsew")
+        
+        folder_zfir = CTkButton(
+            frame_botones2, text="Carpeta ZFIR60", font=("Calibri",12), text_color="black",
+            fg_color="transparent", border_color="black", border_width=2, hover_color="#d11515",
+            width=100, corner_radius=5)
+        folder_zfir.grid(row=0, column=1, ipady=2, padx=(0,10), pady=10, sticky="nsew")
+        
+        folder_bases = CTkButton(
+            frame_botones2, text="Carpeta Bases", font=("Calibri",12), text_color="black",
+            fg_color="transparent", border_color="black", border_width=2, hover_color="#d11515",
+            width=100, corner_radius=5)
+        folder_bases.grid(row=1, column=0, ipady=2, padx=10, pady=10, sticky="nsew")
+        
+        folder_cargas = CTkButton(
+            frame_botones2, text="Carpeta Cargas", font=("Calibri",12), text_color="black",
+            fg_color="transparent", border_color="black", border_width=2, hover_color="#d11515",
+            width=100, corner_radius=5)
+        folder_cargas.grid(row=1, column=1, ipady=2, padx=(0,10), pady=10, sticky="nsew")
+        
+        boton_volver = CTkButton(
+            ventana_config, text="Volver", font=("Calibri",12), text_color="black",
+            fg_color="transparent", border_color="black", border_width=2, hover_color="#d11515",
+            width=100, height=10, corner_radius=5, command=ventana_config.destroy)
+        boton_volver.pack(ipady=2, padx=10, pady=(0,10))
+    
     def crear_app(self):
         self.app = CTk()
         self.app.title("SMS C&CD")
-        icon_path = resource_path("./icono.ico")
-        if os.path.isfile(icon_path):
-            self.app.iconbitmap(icon_path)
+        self.icon_path = resource_path("./icono.ico")
+        if os.path.isfile(self.icon_path):
+            self.app.iconbitmap(self.icon_path)
         else:
-            messagebox.showwarning("ADVERTENCIA", "No se encontró el archivo 'icono.ico' en la ruta: " + icon_path)
+            messagebox.showwarning("ADVERTENCIA", "No se encontró el archivo 'icono.ico' en la ruta: " + self.icon_path)
         self.app.resizable(False, False)
         set_appearance_mode("light")
         
@@ -245,7 +308,7 @@ class App_SMS():
         self.boton_config = CTkButton(
             frame_output, text="Configurar Rutas", font=("Calibri", 12), text_color="black", 
             fg_color="transparent", border_color="black", border_width=2, hover_color="#d11515", 
-            width=25, corner_radius=5, command=self.salir)
+            width=25, corner_radius=5, command=self.configuracion)
         self.boton_config.grid(row=1, rowspan=2, column=2, columnspan=2, padx=(10,10), pady=5, sticky="ns")
         
         self.progressbar = CTkProgressBar(

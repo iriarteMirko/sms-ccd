@@ -1,9 +1,9 @@
-from resource_path import resource_path
+from ..resource_path import resource_path
 import sqlite3 as sql
 
 def conexionSQLite():
     try:
-        conexion = sql.connect(resource_path("database/db.db"))
+        conexion = sql.connect(resource_path("database/rutas.db"))
         return conexion
 
     except sql.Error as ex:

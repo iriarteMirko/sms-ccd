@@ -175,13 +175,13 @@ class App_SMS():
             frame_botones1, text="DACxANALISTA", font=("Calibri",12), text_color="black",
             fg_color="transparent", border_color="black", border_width=2, hover_color="#d11515",
             width=100, corner_radius=5, command=lambda: seleccionar_archivo("DACxANALISTA"))
-        file_dacxanalista.grid(row=0, column=0, ipady=2, padx=10, pady=10, sticky="nsew")
+        file_dacxanalista.grid(row=0, column=0, padx=10, pady=10, sticky="nsew")
         
         file_celulares = CTkButton(
             frame_botones1, text="Base Celulares", font=("Calibri",12), text_color="black",
             fg_color="transparent", border_color="black", border_width=2, hover_color="#d11515",
             width=100, corner_radius=5, command=lambda: seleccionar_archivo("CELULARES"))
-        file_celulares.grid(row=0, column=1, ipady=2, padx=(0,10), pady=10, sticky="nsew")
+        file_celulares.grid(row=0, column=1, padx=(0,10), pady=10, sticky="nsew")
         
         titulo2 = CTkLabel(self.ventana_config, text="Seleccionar Carpetas", font=("Calibri",12,"bold"))
         titulo2.pack(fill="both", expand=True, padx=10, pady=0)
@@ -194,25 +194,25 @@ class App_SMS():
             frame_botones2, text="Carpeta Modelo", font=("Calibri",12), text_color="black", 
             fg_color="transparent", border_color="black", border_width=2, hover_color="#d11515", 
             width=100, corner_radius=5, command=lambda: seleccionar_carpeta("MODELO"))
-        folder_modelo.grid(row=0, column=0, ipady=2, padx=10, pady=10, sticky="nsew")
+        folder_modelo.grid(row=0, column=0, padx=10, pady=10, sticky="nsew")
         
         folder_zfir = CTkButton(
             frame_botones2, text="Carpeta ZFIR60", font=("Calibri",12), text_color="black",
             fg_color="transparent", border_color="black", border_width=2, hover_color="#d11515",
             width=100, corner_radius=5, command=lambda: seleccionar_carpeta("ZFIR"))
-        folder_zfir.grid(row=0, column=1, ipady=2, padx=(0,10), pady=10, sticky="nsew")
+        folder_zfir.grid(row=0, column=1, padx=(0,10), pady=10, sticky="nsew")
         
         folder_bases = CTkButton(
             frame_botones2, text="Carpeta Bases", font=("Calibri",12), text_color="black",
             fg_color="transparent", border_color="black", border_width=2, hover_color="#d11515",
             width=100, corner_radius=5, command=lambda: seleccionar_carpeta("BASES"))
-        folder_bases.grid(row=1, column=0, ipady=2, padx=10, pady=10, sticky="nsew")
+        folder_bases.grid(row=1, column=0, padx=10, pady=10, sticky="nsew")
         
         folder_cargas = CTkButton(
             frame_botones2, text="Carpeta Cargas", font=("Calibri",12), text_color="black",
             fg_color="transparent", border_color="black", border_width=2, hover_color="#d11515",
             width=100, corner_radius=5, command=lambda: seleccionar_carpeta("CARGAS"))
-        folder_cargas.grid(row=1, column=1, ipady=2, padx=(0,10), pady=10, sticky="nsew")
+        folder_cargas.grid(row=1, column=1, padx=(0,10), pady=10, sticky="nsew")
         
         boton_confirmar = CTkButton(
             self.ventana_config, text="Confirmar", font=("Calibri",12), text_color="black",

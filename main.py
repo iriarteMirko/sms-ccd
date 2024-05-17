@@ -1,4 +1,4 @@
-from app_sms import App_SMS
+from src.models.app_sms import App_SMS
 
 
 def main():

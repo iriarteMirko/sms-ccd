@@ -326,7 +326,7 @@ class App_SMS():
             progress_color="#d11515", height=7, border_width=0)
         self.progressbar.pack(fill="x", expand=True, padx=10, pady=(10,0))
         
-        label_copyrigth = CTkLabel(main_frame, text="© Created by: Mirko Iriarte (C26823)", font=("Calibri",8), text_color="black")
+        label_copyrigth = CTkLabel(main_frame, text="© Creado por Mirko Iriarte (C26823)", font=("Calibri",10), text_color="black")
         label_copyrigth.pack(fill="both", expand=True, padx=10, pady=0)
         
         self.app.mainloop()

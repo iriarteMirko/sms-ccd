@@ -5,7 +5,7 @@ def main():
     import warnings
     warnings.filterwarnings("ignore")
     app = App_SMS()
-    app.generar_reporte()
+    app.crear_app()
 
 
 if __name__ == "__main__":

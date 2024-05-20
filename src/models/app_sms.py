@@ -297,14 +297,14 @@ class App_SMS():
         frame_output.pack(fill="both", expand=True, padx=10, pady=(10, 0))
         
         label_nivel1 = CTkLabel(frame_output, text="Nivel 1: ", font=("Calibri",12))
-        label_nivel1.pack(side="left", padx=(40,0), pady=5)
+        label_nivel1.pack(side="left", padx=(25,0), pady=5)
         self.entry_nivel1 = Entry(frame_output, font=("Calibri",12), width=5, state="readonly")
-        self.entry_nivel1.pack(side="left", padx=(0,10), pady=5)
+        self.entry_nivel1.pack(side="left", fill="x", expand=True, padx=(0,10), pady=5)
         
         label_ld = CTkLabel(frame_output, text="LD: ", font=("Calibri",12))
         label_ld.pack(side="left", padx=(10,0), pady=5)
         self.entry_ld = Entry(frame_output, font=("Calibri",12), width=5, state="readonly")
-        self.entry_ld.pack(side="left", padx=(0,40), pady=5)
+        self.entry_ld.pack(side="left", fill="x", expand=True, padx=(0,25), pady=5)
         
         frame_config = CTkFrame(main_frame)
         frame_config.pack(fill="both", expand=True, padx=10, pady=(10, 0))
@@ -312,14 +312,14 @@ class App_SMS():
         self.boton_rutas = CTkButton(
             frame_config, text="Configurar Rutas", font=("Calibri", 12), text_color="black", 
             fg_color="transparent", border_color="black", border_width=2, hover_color="#d11515", 
-            width=80, height=10, corner_radius=5, command=self.ventana_rutas)
-        self.boton_rutas.pack(side="left", ipady=2, padx=(10,5), pady=10)
+            width=50, height=10, corner_radius=5, command=self.ventana_rutas)
+        self.boton_rutas.pack(side="left", fill="both", expand=True, ipady=2, padx=(10,5), pady=10)
         
         self.boton_regla = CTkButton(
-            frame_config, text="Configurar Regla", font=("Calibri", 12), text_color="black", 
+            frame_config, text="Abrir Regla", font=("Calibri", 12), text_color="black", 
             fg_color="transparent", border_color="black", border_width=2, hover_color="#d11515", 
-            width=80, height=10, corner_radius=5, command=self.abrir_regla)
-        self.boton_regla.pack(side="right", ipady=2, padx=(5,10), pady=10)
+            width=50, height=10, corner_radius=5, command=self.abrir_regla)
+        self.boton_regla.pack(side="left", fill="both", expand=True, ipady=2, padx=(5,10), pady=10)
         
         self.progressbar = CTkProgressBar(
             main_frame, mode="indeterminate", orientation="horizontal", 

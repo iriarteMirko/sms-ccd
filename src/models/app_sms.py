@@ -241,13 +241,13 @@ class App_SMS():
         self.boton1 = CTkButton(
             frame_botones, text="1: Actualizar Números", font=("Calibri",12), text_color="black", 
             fg_color="transparent", border_color="black", border_width=2, hover_color="#d11515", 
-            width=200, corner_radius=5, command=lambda: self.iniciar_proceso(1))
+            corner_radius=5, command=lambda: self.iniciar_proceso(1))
         self.boton1.pack(fill="both", expand=True, ipady=2, padx=10, pady=(10, 0))
         
         self.boton2 = CTkButton(
             frame_botones, text="2: Exportar Deudores", font=("Calibri",12), text_color="black", 
             fg_color="transparent", border_color="black", border_width=2, hover_color="#d11515", 
-            width=200, corner_radius=5, command=lambda: self.iniciar_proceso(2))
+            corner_radius=5, command=lambda: self.iniciar_proceso(2))
         self.boton2.pack(fill="both", expand=True, ipady=2, padx=10, pady=(10, 0))
         
         frame_checkbox = CTkFrame(frame_botones, border_width=2, border_color="black")
@@ -277,13 +277,13 @@ class App_SMS():
         self.boton3 = CTkButton(
             frame_botones, text="3: Preparar Bases", font=("Calibri",12), text_color="black", 
             fg_color="transparent", border_color="black", border_width=2, hover_color="#d11515", 
-            width=200, corner_radius=5, command=lambda: self.iniciar_proceso(3))
+            corner_radius=5, command=lambda: self.iniciar_proceso(3))
         self.boton3.pack(fill="both", expand=True, ipady=2, padx=10, pady=(10, 0))
         
         self.boton4 = CTkButton(
             frame_botones, text="4: Exportar TXT", font=("Calibri",12), text_color="black", 
             fg_color="transparent", border_color="black", border_width=2, hover_color="#d11515", 
-            width=200, corner_radius=5, command=lambda: self.iniciar_proceso(4))
+            corner_radius=5, command=lambda: self.iniciar_proceso(4))
         self.boton4.pack(fill="both", expand=True, ipady=2, padx=10, pady=(10, 0))
         
         self.boton_salir = CTkButton(
@@ -296,25 +296,25 @@ class App_SMS():
         frame_output.pack(fill="both", expand=True, padx=10, pady=(10, 0))
         
         label_nivel1 = CTkLabel(frame_output, text="Nivel 1: ", font=("Calibri",12))
-        label_nivel1.grid(row=0, column=0, padx=(10,0), pady=(5,0), sticky="e")
+        label_nivel1.grid(row=0, column=0, padx=(10,0), pady=(5,0), sticky="ew")
         self.entry_nivel1 = Entry(frame_output, font=("Calibri",12), width=5, state="readonly")
-        self.entry_nivel1.grid(row=0, column=1, padx=(0,10), pady=(5,0), sticky="w")
+        self.entry_nivel1.grid(row=0, column=1, padx=(0,10), pady=(5,0), sticky="ew")
         
         label_ld = CTkLabel(frame_output, text="LD: ", font=("Calibri",12))
-        label_ld.grid(row=1, column=0, padx=(10,0), pady=(0,5), sticky="e")
+        label_ld.grid(row=1, column=0, padx=(10,0), pady=(0,5), sticky="ew")
         self.entry_ld = Entry(frame_output, font=("Calibri",12), width=5, state="readonly")
-        self.entry_ld.grid(row=1, column=1, padx=(0,10), pady=(0,5), sticky="w")
+        self.entry_ld.grid(row=1, column=1, padx=(0,10), pady=(0,5), sticky="ew")
         
         label_total = CTkLabel(frame_output, text="Duración: ", font=("Calibri",12))
-        label_total.grid(row=0, column=2, padx=(10,0), pady=(5,0), sticky="e")
+        label_total.grid(row=0, column=2, padx=(10,0), pady=(5,0), sticky="ew")
         self.entry_total = Entry(frame_output, font=("Calibri",12), width=6, state="readonly")
-        self.entry_total.grid(row=0, column=3, padx=(0,10), pady=(5,0), sticky="w")
+        self.entry_total.grid(row=0, column=3, padx=(0,10), pady=(5,0), sticky="ew")
         
         self.boton_config = CTkButton(
             frame_output, text="Configurar Rutas", font=("Calibri", 12), text_color="black", 
             fg_color="transparent", border_color="black", border_width=2, hover_color="#d11515", 
             width=25, height=10, corner_radius=5, command=self.configuracion)
-        self.boton_config.grid(row=1, rowspan=2, column=2, columnspan=2, ipady=2, padx=(10,10), pady=5, sticky="ns")
+        self.boton_config.grid(row=1, rowspan=2, column=2, columnspan=2, ipady=2, padx=(10,10), pady=5, sticky="nsew")
         
         self.progressbar = CTkProgressBar(
             main_frame, mode="indeterminate", orientation="horizontal", 

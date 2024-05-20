@@ -16,7 +16,8 @@ class App_SMS():
         self.boton3.configure(state="disabled")
         self.boton4.configure(state="disabled")
         self.boton_salir.configure(state="disabled")
-        self.boton_config.configure(state="disabled")
+        self.boton_rutas.configure(state="disabled")
+        self.boton_regla.configure(state="disabled")
     
     def habilitar_botones(self):
         self.boton1.configure(state="normal")
@@ -26,7 +27,8 @@ class App_SMS():
         self.boton3.configure(state="normal")
         self.boton4.configure(state="normal")
         self.boton_salir.configure(state="normal")
-        self.boton_config.configure(state="normal")
+        self.boton_rutas.configure(state="normal")
+        self.boton_regla.configure(state="normal")
     
     def verificar_thread(self, thread):
         if thread.is_alive():
@@ -134,10 +136,6 @@ class App_SMS():
             self.entry_ld.insert(0, lista_ld)
             self.entry_ld.configure(state="readonly")
             
-            self.entry_total.configure(state="normal")
-            self.entry_total.delete(0, "end")
-            self.entry_total.insert(0, str(self.tiempo_total) + " s")
-            self.entry_total.configure(state="readonly")
             # Mensajes listos
             messagebox.showinfo(
                 "SMS C&CD", "MENSAJES LISTOS:"
@@ -157,7 +155,7 @@ class App_SMS():
         self.rutas = verificar_rutas()
         self.ventana_config.destroy()
     
-    def configuracion(self):
+    def ventana_rutas(self):
         self.ventana_config =CTkToplevel(self.app)
         self.ventana_config.title("Rutas")
         self.ventana_config.resizable(False, False)
@@ -191,7 +189,7 @@ class App_SMS():
         frame_botones2.pack(fill="both", expand=True, padx=10, pady=(0,10))
         
         folder_modelo = CTkButton(
-            frame_botones2, text="Carpeta Modelo", font=("Calibri",12), text_color="black", 
+            frame_botones2, text="Carpeta MODELO", font=("Calibri",12), text_color="black", 
             fg_color="transparent", border_color="black", border_width=2, hover_color="#d11515", 
             width=100, corner_radius=5, command=lambda: seleccionar_carpeta("MODELO"))
         folder_modelo.grid(row=0, column=0, padx=10, pady=10, sticky="nsew")
@@ -203,13 +201,13 @@ class App_SMS():
         folder_zfir.grid(row=0, column=1, padx=(0,10), pady=10, sticky="nsew")
         
         folder_bases = CTkButton(
-            frame_botones2, text="Carpeta Bases", font=("Calibri",12), text_color="black",
+            frame_botones2, text="Carpeta BASES", font=("Calibri",12), text_color="black",
             fg_color="transparent", border_color="black", border_width=2, hover_color="#d11515",
             width=100, corner_radius=5, command=lambda: seleccionar_carpeta("BASES"))
         folder_bases.grid(row=1, column=0, padx=10, pady=10, sticky="nsew")
         
         folder_cargas = CTkButton(
-            frame_botones2, text="Carpeta Cargas", font=("Calibri",12), text_color="black",
+            frame_botones2, text="Carpeta CARGAS", font=("Calibri",12), text_color="black",
             fg_color="transparent", border_color="black", border_width=2, hover_color="#d11515",
             width=100, corner_radius=5, command=lambda: seleccionar_carpeta("CARGAS"))
         folder_cargas.grid(row=1, column=1, padx=(0,10), pady=10, sticky="nsew")
@@ -219,6 +217,9 @@ class App_SMS():
             fg_color="transparent", border_color="black", border_width=2, hover_color="#d11515",
             width=100, height=10, corner_radius=5, command=self.confirmar_configuracion)
         boton_confirmar.pack(ipady=2, padx=10, pady=(0,10))
+    
+    def abrir_regla(self):
+        os.startfile(resource_path("src/utils/REGLA.xlsx"))
     
     def crear_app(self):
         self.app = CTk()
@@ -296,25 +297,29 @@ class App_SMS():
         frame_output.pack(fill="both", expand=True, padx=10, pady=(10, 0))
         
         label_nivel1 = CTkLabel(frame_output, text="Nivel 1: ", font=("Calibri",12))
-        label_nivel1.grid(row=0, column=0, padx=(10,0), pady=(5,0), sticky="e")
+        label_nivel1.pack(side="left", padx=(40,0), pady=5)
         self.entry_nivel1 = Entry(frame_output, font=("Calibri",12), width=5, state="readonly")
-        self.entry_nivel1.grid(row=0, column=1, padx=(0,10), pady=(5,0), sticky="w")
+        self.entry_nivel1.pack(side="left", padx=(0,10), pady=5)
         
         label_ld = CTkLabel(frame_output, text="LD: ", font=("Calibri",12))
-        label_ld.grid(row=1, column=0, padx=(10,0), pady=(0,5), sticky="e")
+        label_ld.pack(side="left", padx=(10,0), pady=5)
         self.entry_ld = Entry(frame_output, font=("Calibri",12), width=5, state="readonly")
-        self.entry_ld.grid(row=1, column=1, padx=(0,10), pady=(0,5), sticky="w")
+        self.entry_ld.pack(side="left", padx=(0,40), pady=5)
         
-        label_total = CTkLabel(frame_output, text="Duración: ", font=("Calibri",12))
-        label_total.grid(row=0, column=2, padx=(10,0), pady=(5,0), sticky="e")
-        self.entry_total = Entry(frame_output, font=("Calibri",12), width=6, state="readonly")
-        self.entry_total.grid(row=0, column=3, padx=(0,10), pady=(5,0), sticky="w")
+        frame_config = CTkFrame(main_frame)
+        frame_config.pack(fill="both", expand=True, padx=10, pady=(10, 0))
         
-        self.boton_config = CTkButton(
-            frame_output, text="Configurar Rutas", font=("Calibri", 12), text_color="black", 
+        self.boton_rutas = CTkButton(
+            frame_config, text="Configurar Rutas", font=("Calibri", 12), text_color="black", 
             fg_color="transparent", border_color="black", border_width=2, hover_color="#d11515", 
-            width=25, height=10, corner_radius=5, command=self.configuracion)
-        self.boton_config.grid(row=1, rowspan=2, column=2, columnspan=2, ipady=2, padx=(10,10), pady=5, sticky="ns")
+            width=80, height=10, corner_radius=5, command=self.ventana_rutas)
+        self.boton_rutas.pack(side="left", ipady=2, padx=(10,5), pady=10)
+        
+        self.boton_regla = CTkButton(
+            frame_config, text="Configurar Regla", font=("Calibri", 12), text_color="black", 
+            fg_color="transparent", border_color="black", border_width=2, hover_color="#d11515", 
+            width=80, height=10, corner_radius=5, command=self.abrir_regla)
+        self.boton_regla.pack(side="right", ipady=2, padx=(5,10), pady=10)
         
         self.progressbar = CTkProgressBar(
             main_frame, mode="indeterminate", orientation="horizontal", 
@@ -322,9 +327,3 @@ class App_SMS():
         self.progressbar.pack(fill="x", expand=True, padx=10, pady=10)
         
         self.app.mainloop()
-    
-    def generar_reporte(self):
-        try:
-            self.crear_app()
-        except Exception as ex:
-            messagebox.showerror("ERROR", "Algo salió mal. Por favor, intente nuevamente.\n\nDetalles: " + str(ex))

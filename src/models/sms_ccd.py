@@ -100,7 +100,7 @@ class SMS_CCD():
             elif row["TIPO"] == "SIN_LINEA":
                 return f'51{row["CELULAR"]}{df_texto["TEXTO_1"][5]}{row["NOMBRE"]}{df_texto["TEXTO_2"][5]}'
         else:
-            return f'51{row["CELULAR"]}{df_texto["TEXTO_1"][6]}{row["Total Vencida"]}{df_texto["TEXTO_2"][5]}'
+            return f'51{row["CELULAR"]}{df_texto["TEXTO_1"][6]}{row["Total Vencida"]}{df_texto["TEXTO_2"][6]}'
     
     def exportar_deudores(self):
         df_recaudacion = pd.read_csv(self.reporte_recaudacion, encoding="latin1")

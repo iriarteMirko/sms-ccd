@@ -1,5 +1,5 @@
 from ..utils.resource_path import *
-from models.sms_apoyo import SMS_APOYO
+from ..models.sms_apoyo import SMS_APOYO
 from datetime import datetime, timedelta
 import pandas as pd
 
@@ -221,5 +221,5 @@ class SMS_CCD():
         return str(len(lista_nivel_1)), str(len(lista_ld))
     
     def generar_apoyos(self):
-        reporte = SMS_APOYO(self.ruta_regla, self.ruta_dacxanalista, self.ruta_base_celulares, self.ruta_vacaciones, self.ruta_apoyos)
+        reporte = SMS_APOYO(self.ruta_regla, self.ruta_dacxanalista, self.ruta_base_celulares, self.ruta_vacaciones, self.ruta_apoyos, self.apoyos_txt)
         return reporte.generar_sms()

@@ -3,15 +3,16 @@ import pandas as pd
 
 
 class SMS_APOYO():
-    def __init__(self, ruta_regla, ruta_dacxanalista, ruta_base_celulares, ruta_vacaciones, ruta_apoyos):
+    def __init__(self, ruta_regla, ruta_dacxanalista, ruta_base_celulares, ruta_vacaciones, ruta_apoyos, apoyos_txt):
         self.fecha_hoy = datetime.now().strftime('%d.%m.%Y')
         self.ruta_regla = ruta_regla
         self.ruta_dacxanalista = ruta_dacxanalista
         self.ruta_celulares = ruta_base_celulares
         self.ruta_vacaciones = ruta_vacaciones
         self.ruta_apoyos = ruta_apoyos
+        self.apoyos_txt = apoyos_txt
     
-    def depurar_dacx(self,):
+    def depurar_dacx(self):
         columnas = ['DEUDOR', 'NOMBRE', 'RUC', 'ANALISTA_ACT', 'TIPO_DAC', 'ESTADO']
         no_analistas = ['REGION NORTE', 'REGION SUR', 'WALTER LOPEZ', 'SIN INFORMACION']
         no_estados = ['LIQUIDADO', 'PROCESO DE LIQUIDACIÓN']
@@ -27,7 +28,7 @@ class SMS_APOYO():
         self.df_dacx = df_dacx
         self.list_analistas = df_dacx['ANALISTA'].unique()
     
-    def actualizar_apoyos(self,):
+    def actualizar_apoyos(self):
         df_apoyos = pd.read_excel(self.ruta_apoyos, sheet_name='GENERAL', usecols=['DEUDOR', 'APOYO1', 'APOYO2', 'APOYO3'])
         df_apoyos['DEUDOR'] = df_apoyos['DEUDOR'].astype('Int64').astype(str)
         df_apoyos = pd.merge(df_apoyos, self.df_dacx, on='DEUDOR', how='right')
@@ -47,7 +48,7 @@ class SMS_APOYO():
                 df_apoyos.reset_index(drop=True, inplace=True)
                 df_apoyos.to_excel(writer, sheet_name=analista, index=False)
     
-    def depurar_celulares(self,):
+    def depurar_celulares(self):
         df_celulares = pd.read_excel(self.ruta_celulares)
         df_celulares['DEUDOR'] = df_celulares['DEUDOR'].astype('Int64').astype(str)
         df_celulares['CELULAR'] = df_celulares['CELULAR'].astype('Int64').astype(str)
@@ -58,7 +59,7 @@ class SMS_APOYO():
         df_celulares.reset_index(drop=True, inplace=True)
         self.df_celulares = df_celulares
     
-    def cruzar_data(self,):
+    def cruzar_data(self):
         df_apoyos = pd.read_excel(self.ruta_apoyos, sheet_name='GENERAL', usecols=['DEUDOR', 'ANALISTA', 'APOYO1', 'APOYO2', 'APOYO3'])
         df_apoyos['DEUDOR'] = df_apoyos['DEUDOR'].astype('Int64').astype(str)
         df_cruce = pd.merge(self.df_celulares, df_apoyos, on='DEUDOR', how='left')
@@ -66,7 +67,7 @@ class SMS_APOYO():
         df_cruce.reset_index(drop=True, inplace=True)
         self.df_cruce = df_cruce
     
-    def obtener_texto(self,):
+    def obtener_texto(self):
         df_texto = pd.read_excel(self.ruta_regla, sheet_name='TEXTO_APOYO')
         self.texto1 = df_texto['TEXTO'][0]
         self.texto2 = df_texto['TEXTO'][1]
@@ -89,12 +90,12 @@ class SMS_APOYO():
         self.df_cruce['TEXTO'] = self.df_cruce.apply(lambda row: f'{row["CELULAR"]}{self.texto1}{row["ANALISTA"]}{self.texto2}{row["FECHA_RETORNO"]}{self.texto3}{row["APOYO"]}{self.texto4}', axis=1)
         self.lista_apoyos = self.df_cruce["TEXTO"].to_list()
     
-    def exportar_txt(self,):
-        with open(self.ruta_apoyos, "w") as f:
+    def exportar_txt(self):
+        with open(self.apoyos_txt, "w") as f:
             for item in self.lista_apoyos:
                 f.write("%s\n" % item)
     
-    def generar_sms(self,):
+    def generar_sms(self):
         df_vacaciones = pd.read_excel(self.ruta_vacaciones, sheet_name='VACACIONES')
         df_vacaciones.dropna(inplace=True)
         

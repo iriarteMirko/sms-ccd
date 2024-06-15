@@ -1,11 +1,12 @@
 from ..utils.resource_path import *
+from models.sms_apoyo import SMS_APOYO
 from datetime import datetime, timedelta
 import pandas as pd
 
 
 class SMS_CCD():
     def __init__(self, rutas):
-        self.regla_path = resource_path("src/utils/REGLA.xlsx")
+        self.ruta_regla = resource_path("src/utils/REGLA.xlsx")
         
         fecha_hoy = datetime.today()
         fecha_ayer = fecha_hoy - timedelta(days=1)
@@ -21,6 +22,7 @@ class SMS_CCD():
         
         bases = rutas[4]
         cargas = rutas[5]
+        vacaciones = rutas[6]
         
         self.reporte_recaudacion = bases + "/Reporte_Recaudacion_"+self.fecha_hoy+".csv"
         self.fbl5n_hoja = bases + "/FBL5N_HOJA.xlsx"
@@ -29,6 +31,10 @@ class SMS_CCD():
         
         self.ld_txt = cargas + "/LD "+self.fecha_hoy_txt+".txt"
         self.nivel_1_txt = cargas + "/Nivel 1 "+self.fecha_hoy_txt+".txt"
+        self.apoyos_txt = cargas + "/Apoyos "+self.fecha_hoy_txt+".txt"
+        
+        self.ruta_vacaciones = vacaciones + "/VACACIONES.xlsx"
+        self.ruta_apoyos = vacaciones + "/APOYOS_CCD.xlsx"
         
         self.contador = 0
     
@@ -38,7 +44,7 @@ class SMS_CCD():
     def actualizar_base_celulares(self):
         df_base_celulares = pd.read_excel(self.ruta_base_celulares)
         df_dacxanalista = pd.read_excel(self.ruta_dacxanalista, sheet_name="Base_NUEVA")
-        df_dac_tipos = pd.read_excel(self.regla_path, sheet_name="NO_VALIDOS")
+        df_dac_tipos = pd.read_excel(self.ruta_regla, sheet_name="NO_VALIDOS")
         lista_tipo_dac_no_validos = df_dac_tipos["TIPOS_NO_VALIDOS"].to_list()
         columnas_requeridas = ["DEUDOR", "NOMBRE", "REGION", "ANALISTA_ACT", "TIPO_DAC", "ESTADO"]
         df_dacxanalista = df_dacxanalista[columnas_requeridas]
@@ -84,7 +90,7 @@ class SMS_CCD():
         return resultados
     
     def generar_texto(self, row):
-        df_texto = pd.read_excel(self.regla_path, sheet_name="TEXTO")
+        df_texto = pd.read_excel(self.ruta_regla, sheet_name="TEXTO")
         if self.contador == 0:
             if row["TIPO"] == "DISPONIBLE":
                 return f'51{row["CELULAR"]}{df_texto["TEXTO_1"][0]}{row["NOMBRE"]}{df_texto["TEXTO_2"][0]}{row["TOTAL"]}{df_texto["TEXTO_3"][0]}'
@@ -213,3 +219,7 @@ class SMS_CCD():
                 f.write("%s\n" % item)
         # Resultados
         return str(len(lista_nivel_1)), str(len(lista_ld))
+    
+    def generar_apoyos(self):
+        reporte = SMS_APOYO(self.ruta_regla, self.ruta_dacxanalista, self.ruta_base_celulares, self.ruta_vacaciones, self.ruta_apoyos)
+        return reporte.generar_sms()

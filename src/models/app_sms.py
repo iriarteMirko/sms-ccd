@@ -121,6 +121,7 @@ class App_SMS():
         try:
             inicio = time.time()
             lista_nivel_1, lista_ld = self.reporte.exportar_archivos_txt()
+            signal, result = self.reporte.generar_apoyos()
             fin = time.time()
             proceso4 = fin - inicio
             self.tiempo_proceso = round((self.proceso1 + self.proceso2 + self.proceso3 + proceso4),2)
@@ -145,6 +146,10 @@ class App_SMS():
                 + "\n- Proceso: " + str(self.tiempo_proceso) + " segundos."
                 + "\n- SAP: " + str(tiempo_sap) + " segundos."
                 + "\n- Total: " + str(self.tiempo_total) + " segundos.")
+            if signal:
+                messagebox.showinfo(
+                    "SMS C&CD", "MENSAJES APOYOS LISTOS:"
+                    + "\n- Registros validados: " + str(result) + " destinatarios.")
             os.startfile(self.rutas[5])
         except Exception as e:
             messagebox.showerror("ERROR", "Algo salió mal. Por favor, intente nuevamente.\nDetalles: " + str(e))
@@ -211,6 +216,12 @@ class App_SMS():
             fg_color="transparent", border_color="black", border_width=2, hover_color="#d11515",
             width=100, corner_radius=5, command=lambda: seleccionar_carpeta("CARGAS"))
         folder_cargas.grid(row=1, column=1, padx=(0,10), pady=10, sticky="nsew")
+        
+        folder_vacaciones = CTkButton(
+            frame_botones2, text="Carpeta VACACIONES & APOYOS", font=("Calibri",12), text_color="black",
+            fg_color="transparent", border_color="black", border_width=2, hover_color="#d11515",
+            corner_radius=5, command=lambda: seleccionar_carpeta("VACACIONES"))
+        folder_vacaciones.grid(row=2, column=0, columnspan=2, padx=10, pady=10, sticky="nsew")
         
         boton_confirmar = CTkButton(
             self.ventana_config, text="Confirmar", font=("Calibri",12), text_color="black",

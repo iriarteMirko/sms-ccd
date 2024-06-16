@@ -150,7 +150,7 @@ class App_SMS():
                 messagebox.showinfo(
                     "SMS C&CD", "MENSAJES APOYOS LISTOS:"
                     + "\n- Registros validados: " + str(result) + " destinatarios.")
-            os.startfile(self.rutas[5])
+            os.startfile(self.rutas[3]+"/CARGAS")
         except Exception as e:
             messagebox.showerror("ERROR", "Algo salió mal. Por favor, intente nuevamente.\nDetalles: " + str(e))
         finally:
@@ -177,14 +177,8 @@ class App_SMS():
         file_dacxanalista = CTkButton(
             frame_botones1, text="DACxANALISTA", font=("Calibri",12), text_color="black",
             fg_color="transparent", border_color="black", border_width=2, hover_color="#d11515",
-            width=100, corner_radius=5, command=lambda: seleccionar_archivo("DACXANALISTA"))
-        file_dacxanalista.grid(row=0, column=0, padx=10, pady=10, sticky="nsew")
-        
-        file_celulares = CTkButton(
-            frame_botones1, text="Base Celulares", font=("Calibri",12), text_color="black",
-            fg_color="transparent", border_color="black", border_width=2, hover_color="#d11515",
-            width=100, corner_radius=5, command=lambda: seleccionar_archivo("CELULARES"))
-        file_celulares.grid(row=0, column=1, padx=(0,10), pady=10, sticky="nsew")
+            corner_radius=5, command=lambda: seleccionar_archivo("DACXANALISTA"))
+        file_dacxanalista.pack(fill="both", expand=True, padx=10, pady=10)
         
         titulo2 = CTkLabel(self.ventana_config, text="Seleccionar Carpetas", font=("Calibri",12,"bold"))
         titulo2.pack(fill="both", expand=True, padx=10, pady=0)
@@ -194,34 +188,28 @@ class App_SMS():
         frame_botones2.pack(fill="both", expand=True, padx=10, pady=(0,10))
         
         folder_modelo = CTkButton(
-            frame_botones2, text="Carpeta MODELO", font=("Calibri",12), text_color="black", 
+            frame_botones2, text="MODELO", font=("Calibri",12), text_color="black", 
             fg_color="transparent", border_color="black", border_width=2, hover_color="#d11515", 
             width=100, corner_radius=5, command=lambda: seleccionar_carpeta("MODELO"))
         folder_modelo.grid(row=0, column=0, padx=10, pady=10, sticky="nsew")
         
         folder_zfir = CTkButton(
-            frame_botones2, text="Carpeta ZFIR60", font=("Calibri",12), text_color="black",
+            frame_botones2, text="ZFIR60", font=("Calibri",12), text_color="black",
             fg_color="transparent", border_color="black", border_width=2, hover_color="#d11515",
-            width=100, corner_radius=5, command=lambda: seleccionar_carpeta("ZFIR"))
+            width=100, corner_radius=5, command=lambda: seleccionar_carpeta("ZFIR60"))
         folder_zfir.grid(row=0, column=1, padx=(0,10), pady=10, sticky="nsew")
         
         folder_bases = CTkButton(
-            frame_botones2, text="Carpeta BASES", font=("Calibri",12), text_color="black",
+            frame_botones2, text="SMS CCD", font=("Calibri",12), text_color="black",
             fg_color="transparent", border_color="black", border_width=2, hover_color="#d11515",
-            width=100, corner_radius=5, command=lambda: seleccionar_carpeta("BASES"))
+            width=100, corner_radius=5, command=lambda: seleccionar_carpeta("SMS CCD"))
         folder_bases.grid(row=1, column=0, padx=10, pady=10, sticky="nsew")
         
         folder_cargas = CTkButton(
-            frame_botones2, text="Carpeta CARGAS", font=("Calibri",12), text_color="black",
+            frame_botones2, text="VACACIONES", font=("Calibri",12), text_color="black",
             fg_color="transparent", border_color="black", border_width=2, hover_color="#d11515",
-            width=100, corner_radius=5, command=lambda: seleccionar_carpeta("CARGAS"))
+            width=100, corner_radius=5, command=lambda: seleccionar_carpeta("VACACIONES"))
         folder_cargas.grid(row=1, column=1, padx=(0,10), pady=10, sticky="nsew")
-        
-        folder_vacaciones = CTkButton(
-            frame_botones2, text="Carpeta VACACIONES & APOYOS", font=("Calibri",12), text_color="black",
-            fg_color="transparent", border_color="black", border_width=2, hover_color="#d11515",
-            corner_radius=5, command=lambda: seleccionar_carpeta("VACACIONES"))
-        folder_vacaciones.grid(row=2, column=0, columnspan=2, padx=10, pady=10, sticky="nsew")
         
         boton_confirmar = CTkButton(
             self.ventana_config, text="Confirmar", font=("Calibri",12), text_color="black",

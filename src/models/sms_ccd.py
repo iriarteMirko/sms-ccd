@@ -15,24 +15,23 @@ class SMS_CCD():
         self.fecha_hoy_txt = datetime.today().strftime("%d.%m.%Y")
         
         self.ruta_dacxanalista = rutas[0]
-        self.ruta_base_celulares = rutas[1]
+        self.ruta_modelo = rutas[1] + "/Modelo de Evaluación de Pedidos de Equipos_"+self.fecha_hoy+".xlsx"
+        self.ruta_zfir60 = rutas[2] + "/ZFIR60_"+self.fecha_hoy+".xlsx"
+        sms_ccd = rutas[3]
         
-        self.ruta_modelo = rutas[2] + "/Modelo de Evaluación de Pedidos de Equipos_"+self.fecha_hoy+".xlsx"
-        self.ruta_zfir60 = rutas[3] + "/ZFIR60_"+self.fecha_hoy+".xlsx"
+        self.bases = sms_ccd + "/BASES"
+        self.ruta_base_celulares = self.bases + "/Base_Celulares_CCD.xlsx"
+        self.reporte_recaudacion = self.bases + "/Reporte_Recaudacion_"+self.fecha_hoy+".csv"
+        self.fbl5n_hoja = self.bases + "/FBL5N_HOJA.xlsx"
+        self.fbl5n_fichero = self.bases + "/FBL5N_FICHERO.xlsx"
+        self.deudores = self.bases + "/Deudores.xlsx"
         
-        bases = rutas[4]
-        cargas = rutas[5]
-        vacaciones = rutas[6]
+        self.cargas = sms_ccd + "/CARGAS"
+        self.ld_txt = self.cargas + "/LD "+self.fecha_hoy_txt+".txt"
+        self.nivel_1_txt = self.cargas + "/Nivel 1 "+self.fecha_hoy_txt+".txt"
+        self.apoyos_txt = self.cargas + "/Apoyos "+self.fecha_hoy_txt+".txt"
         
-        self.reporte_recaudacion = bases + "/Reporte_Recaudacion_"+self.fecha_hoy+".csv"
-        self.fbl5n_hoja = bases + "/FBL5N_HOJA.xlsx"
-        self.fbl5n_fichero = bases + "/FBL5N_FICHERO.xlsx"
-        self.deudores = bases + "/Deudores.xlsx"
-        
-        self.ld_txt = cargas + "/LD "+self.fecha_hoy_txt+".txt"
-        self.nivel_1_txt = cargas + "/Nivel 1 "+self.fecha_hoy_txt+".txt"
-        self.apoyos_txt = cargas + "/Apoyos "+self.fecha_hoy_txt+".txt"
-        
+        vacaciones = rutas[4]
         self.ruta_vacaciones = vacaciones + "/VACACIONES.xlsx"
         self.ruta_apoyos = vacaciones + "/APOYOS_CCD.xlsx"
         
@@ -109,6 +108,11 @@ class SMS_CCD():
             return f'51{row["CELULAR"]}{df_texto["TEXTO_1"][6]}{row["Total Vencida"]}{df_texto["TEXTO_2"][6]}'
     
     def exportar_deudores(self):
+        archivos = os.listdir(self.bases)
+        for archivo in archivos:
+            if "Reporte_Recaudacion_" in archivo and self.fecha_hoy not in archivo:
+                os.remove(self.bases+"/"+archivo)
+                print(f"Se ha eliminado el archivo {archivo}")
         df_recaudacion = pd.read_csv(self.reporte_recaudacion, encoding="latin1")
         df_recaudacion = df_recaudacion.drop("USER_ID", axis=1)
         df_recaudacion = df_recaudacion[df_recaudacion["FECHA_RECAUDACION"] == int(self.fecha_ayer)]

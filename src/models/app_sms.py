@@ -57,9 +57,9 @@ class App_SMS():
         if self.rutas == None:
             self.progressbar.stop()
             return
-        self.reporte: SMS_CCD = SMS_CCD(self.rutas)
         try:
             inicio: float = time.time()
+            self.reporte: SMS_CCD = SMS_CCD(self.rutas)
             resultados: list[int] = self.reporte.actualizar_base_celulares()
             fin: float = time.time()
             self.proceso1: float = fin - inicio

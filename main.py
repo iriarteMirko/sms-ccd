@@ -1,10 +1,10 @@
 from src.models.app_sms import App_SMS
+import warnings
 
 
-def main():
-    import warnings
+def main() -> None:
     warnings.filterwarnings("ignore")
-    app = App_SMS()
+    app: App_SMS = App_SMS()
     app.crear_app()
 
 

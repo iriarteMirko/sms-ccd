@@ -95,7 +95,7 @@ class SMS_APOYO():
         self.df_cruce["FECHA_RETORNO"] = self.df_cruce["FECHA_RETORNO"].str.replace(".", "/")
         self.df_cruce.reset_index(drop=True, inplace=True)
         self.df_cruce = self.df_cruce[["CELULAR", "ANALISTA", "FECHA_RETORNO","APOYO"]]
-        self.df_cruce["TEXTO"] = self.df_cruce.apply(lambda row: f"{row["CELULAR"]}{self.texto1}{row["ANALISTA"]}{self.texto2}{row["FECHA_RETORNO"]}{self.texto3}{row["APOYO"]}{self.texto4}", axis=1)
+        self.df_cruce["TEXTO"] = self.df_cruce.apply(lambda row: f'{row["CELULAR"]}{self.texto1}{row["ANALISTA"]}{self.texto2}{row["FECHA_RETORNO"]}{self.texto3}{row["APOYO"]}{self.texto4}', axis=1)
         self.lista_apoyos: list[str] = self.df_cruce["TEXTO"].to_list()
     
     def exportar_txt(self) -> None:

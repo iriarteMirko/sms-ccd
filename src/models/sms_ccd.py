@@ -12,7 +12,7 @@ class SMS_CCD():
         fecha_ayer: datetime = fecha_hoy - timedelta(days=1)
         self.fecha_ayer: str = fecha_ayer.strftime("%Y%m%d")
         self.fecha_hoy: str = fecha_hoy.strftime("%Y%m%d")
-        self.fecha_hoy_txt: str = fecha_hoy.strftime("%d%m%Y")
+        self.fecha_hoy_txt: str = fecha_hoy.strftime("%d.%m.%Y")
         
         self.ruta_dacxanalista: str = rutas[0]
         self.ruta_modelo: str = rutas[1] + "/Modelo de Evaluación de Pedidos de Equipos_"+self.fecha_hoy+".xlsx"
@@ -45,7 +45,7 @@ class SMS_CCD():
         df_dacxanalista: pd.DataFrame = pd.read_excel(self.ruta_dacxanalista, sheet_name="Base_NUEVA")
         df_dac_tipos: pd.DataFrame = pd.read_excel(self.ruta_regla, sheet_name="NO_VALIDOS")
         
-        lista_tipo_dac_no_validos: list[str] = df_dac_tipos["TIPO_DAC"].to_list()
+        lista_tipo_dac_no_validos: list[str] = df_dac_tipos["TIPOS_NO_VALIDOS"].to_list()
         columnas_requeridas: list[str] = ["DEUDOR", "NOMBRE", "REGION", "ANALISTA_ACT", "TIPO_DAC", "ESTADO"]
         
         df_dacxanalista = df_dacxanalista[columnas_requeridas]

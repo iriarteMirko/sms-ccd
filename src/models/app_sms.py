@@ -8,7 +8,7 @@ import time
 
 
 class App_SMS():
-    def deshabilitar_botones(self):
+    def deshabilitar_botones(self) -> None:
         self.boton1.configure(state="disabled")
         self.boton2.configure(state="disabled")
         self.checkbox_hoja.configure(state="disabled")
@@ -19,7 +19,7 @@ class App_SMS():
         self.boton_rutas.configure(state="disabled")
         self.boton_regla.configure(state="disabled")
     
-    def habilitar_botones(self):
+    def habilitar_botones(self) -> None:
         self.boton1.configure(state="normal")
         self.boton2.configure(state="normal")
         self.checkbox_hoja.configure(state="normal")
@@ -30,13 +30,13 @@ class App_SMS():
         self.boton_rutas.configure(state="normal")
         self.boton_regla.configure(state="normal")
     
-    def verificar_thread(self, thread):
+    def verificar_thread(self, thread: threading.Thread) -> None:
         if thread.is_alive():
             self.app.after(1000, self.verificar_thread, thread)
         else:
             self.habilitar_botones()
     
-    def iniciar_proceso(self, accion):
+    def iniciar_proceso(self, accion: int) -> None:
         self.deshabilitar_botones()
         if accion == 1:
             thread = threading.Thread(target=self.accion_boton1)
@@ -51,7 +51,7 @@ class App_SMS():
         thread.start()
         self.app.after(1000, self.verificar_thread, thread)
     
-    def accion_boton1(self):
+    def accion_boton1(self) -> None:
         self.progressbar.start()
         self.rutas = verificar_rutas()
         self.reporte = SMS_CCD(self.rutas)
@@ -75,7 +75,7 @@ class App_SMS():
         finally:
             self.progressbar.stop()
     
-    def accion_boton2(self):
+    def accion_boton2(self) -> None:
         self.progressbar.start()
         try:
             inicio = time.time()
@@ -88,7 +88,7 @@ class App_SMS():
         finally:
             self.progressbar.stop()
     
-    def accion_boton3(self):
+    def accion_boton3(self) -> None:
         self.fin_sap = time.time()
         self.progressbar.start()
         try:
@@ -116,7 +116,7 @@ class App_SMS():
         finally:
             self.progressbar.stop()
     
-    def accion_boton4(self):
+    def accion_boton4(self) -> None:
         self.progressbar.start()
         try:
             inicio = time.time()
@@ -156,11 +156,11 @@ class App_SMS():
         finally:
             self.progressbar.stop()
     
-    def confirmar_configuracion(self):
+    def confirmar_configuracion(self) -> None:
         self.rutas = verificar_rutas()
         self.ventana_config.destroy()
     
-    def ventana_rutas(self):
+    def ventana_rutas(self) -> None:
         self.ventana_config =CTkToplevel(self.app)
         self.ventana_config.title("Rutas")
         self.ventana_config.resizable(False, False)
@@ -216,11 +216,23 @@ class App_SMS():
             fg_color="transparent", border_color="black", border_width=2, hover_color="#d11515",
             width=100, height=10, corner_radius=5, command=self.confirmar_configuracion)
         boton_confirmar.pack(ipady=2, padx=10, pady=(0,10))
+        
+        self.centrar_ventana(self.ventana_config)
     
-    def abrir_regla(self):
+    def abrir_regla(self) -> None:
         os.startfile(resource_path("src/utils/REGLA.xlsx"))
     
-    def crear_app(self):
+    def centrar_ventana(self, ventana: CTk) -> None: 
+        screen_width = ventana.winfo_screenwidth()
+        screen_height = ventana.winfo_screenheight()
+        ventana.update_idletasks()
+        ventana_width = ventana.winfo_reqwidth()
+        ventana_height = ventana.winfo_reqheight()
+        x = (screen_width - ventana_width) // 2
+        y = (screen_height - ventana_height) // 2
+        ventana.geometry(f"+{x}+{y}")
+    
+    def crear_app(self) -> None:
         self.app = CTk()
         self.app.title("SMS C&CD")
         self.icon_path = resource_path("src/images/icono.ico")
@@ -328,4 +340,5 @@ class App_SMS():
         label_copyrigth = CTkLabel(main_frame, text="© Creado por Mirko Iriarte (C26823)", font=("Calibri",10), text_color="black")
         label_copyrigth.pack(fill="both", expand=True, padx=10, pady=0)
         
+        self.centrar_ventana(self.app)
         self.app.mainloop()

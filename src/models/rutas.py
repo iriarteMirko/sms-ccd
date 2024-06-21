@@ -41,7 +41,7 @@ def seleccionar_carpeta(nombre: str) -> None:
     try:
         ruta: str = filedialog.askdirectory(
             initialdir="/",
-            title="Seleccionar carpeta " + str(nombre)
+            title="Seleccionar carpeta " + nombre
         )
         set_ruta(ruta, nombre)
     except Exception as ex:

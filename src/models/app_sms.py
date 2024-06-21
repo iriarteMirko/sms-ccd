@@ -143,7 +143,6 @@ class App_SMS():
             self.entry_ld.delete(0, "end")
             self.entry_ld.insert(0, lista_ld)
             self.entry_ld.configure(state="readonly")
-            
             # Mensajes listos
             messagebox.showinfo(
                 "SMS C&CD", "MENSAJES LISTOS:"
@@ -153,11 +152,12 @@ class App_SMS():
                 + f"\n- Proceso: {self.tiempo_proceso} segundos."
                 + f"\n- SAP: {tiempo_sap} segundos."
                 + f"\n- Total: {self.tiempo_total} segundos.")
-            
+            # Mensajes apoyos
             if signal:
                 messagebox.showinfo(
                     "SMS C&CD", "MENSAJES APOYOS LISTOS:"
                     + f"\n- Registros validados: {total_apoyos} destinatarios.")
+            # Abrir carpeta CARGAS
             os.startfile(f"{self.rutas[3]}/CARGAS")
         except Exception as e:
             messagebox.showerror("ERROR", "Algo salió mal. Por favor, intente nuevamente.\nDetalles: " + str(e))

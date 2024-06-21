@@ -2,9 +2,9 @@ import sys
 import os
 
 
-def resource_path(relative_path):
+def resource_path(relative_path: str) -> str:
     try:
-        base_path = sys._MEIPASS2
+        base_path: str = sys._MEIPASS
     except Exception:
-        base_path = os.path.abspath(".")
+        base_path: str = os.path.abspath(".")
     return os.path.join(base_path, relative_path)

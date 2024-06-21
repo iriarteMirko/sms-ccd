@@ -2,20 +2,20 @@ from ..utils.resource_path import resource_path
 from tkinter import messagebox
 import sqlite3 as sql
 
-def get_conexion():
+def get_conexion() -> sql.Connection:
     try:
-        conexion = sql.connect(resource_path("src/database/rutas.db"))
+        conexion: sql.Connection = sql.connect(resource_path("src/database/rutas.db"))
         return conexion
     except sql.Error as ex:
         messagebox.showerror("Error", "Error al conectar a la base de datos: " + str(ex))
 
-def get_rutas():
+def get_rutas() -> list[tuple[str, str]]:
     try:
-        query = "SELECT NOMBRE,RUTA FROM RUTAS"
-        conexion = get_conexion()
-        cursor = conexion.cursor()
+        query: str = "SELECT NOMBRE,RUTA FROM RUTAS"
+        conexion: sql.Connection = get_conexion()
+        cursor: sql.Cursor = conexion.cursor()
         cursor.execute(query)
-        resultados = cursor.fetchall()
+        resultados: list[tuple[str, str]] = cursor.fetchall()
         return resultados
     except sql.Error as ex:
         messagebox.showerror("Error", "Error al obtener las rutas: " + str(ex))
@@ -23,11 +23,11 @@ def get_rutas():
         cursor.close()
         conexion.close()
 
-def set_ruta(ruta, nombre):
+def set_ruta(ruta: str, nombre: str) -> None:
     try:
-        query = """UPDATE RUTAS SET RUTA = '"""+ruta+"""' WHERE NOMBRE = '"""+nombre+"""'"""
-        conexion = get_conexion()
-        cursor = conexion.cursor()
+        query: str = """UPDATE RUTAS SET RUTA = '""" + ruta + """' WHERE NOMBRE = '""" + nombre + """'"""
+        conexion: sql.Connection = get_conexion()
+        cursor: sql.Cursor = conexion.cursor()
         cursor.execute(query)
         conexion.commit()
     except sql.Error as ex:

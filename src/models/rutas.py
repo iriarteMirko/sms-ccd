@@ -3,11 +3,11 @@ from customtkinter import filedialog
 from tkinter import messagebox
 
 
-def verificar_rutas():
+def verificar_rutas() -> list[str] | None:
     try:
-        rutas = get_rutas()
-        rutas_general = []
-        rutas_vacias = []
+        rutas: list[tuple[str, str]] = get_rutas()
+        rutas_general: list[str] = []
+        rutas_vacias: list[str] = []
         for ruta in rutas:
             if ruta[1] == None or ruta[1] == "":
                 rutas_vacias.append(ruta[0])
@@ -20,31 +20,29 @@ def verificar_rutas():
                 "Las siguientes rutas no han sido seleccionadas:" 
                 + "\n("+", ".join(rutas_vacias)+")\n"
                 + "\nPor favor seleccione las rutas faltantes.")
-            return rutas_general
+            return None
         else:
             return rutas_general
     except Exception as ex:
         messagebox.showerror("Error", "Error al verificar las rutas:" + str(ex))
 
-def seleccionar_archivo(nombre):
+def seleccionar_archivo(nombre: str) -> None:
     try:
-        archivo = filedialog.askopenfilename(
+        ruta: str = filedialog.askopenfilename(
             initialdir="/",
-            title="Seleccionar archivo " + str(nombre),
+            title="Seleccionar archivo " + nombre,
             filetypes=(("Archivos de Excel", "*.xlsx"), ("Todos los archivos", "*.*"))
         )
-        ruta = archivo
         set_ruta(ruta, nombre)
     except Exception as ex:
         messagebox.showerror("Error", "Error al seleccionar el archivo:" + str(ex))
 
-def seleccionar_carpeta(nombre):
+def seleccionar_carpeta(nombre: str) -> None:
     try:
-        carpeta = filedialog.askdirectory(
+        ruta: str = filedialog.askdirectory(
             initialdir="/",
             title="Seleccionar carpeta " + str(nombre)
         )
-        ruta = carpeta
         set_ruta(ruta, nombre)
     except Exception as ex:
         messagebox.showerror("Error", "Error al seleccionar la carpeta:" + str(ex))

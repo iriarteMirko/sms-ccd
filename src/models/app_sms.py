@@ -47,29 +47,32 @@ class App_SMS():
         elif accion == 4:
             thread = threading.Thread(target=self.accion_boton4)
         else:
-            return        
+            return
         thread.start()
         self.app.after(1000, self.verificar_thread, thread)
     
     def accion_boton1(self) -> None:
         self.progressbar.start()
-        self.rutas = verificar_rutas()
-        self.reporte = SMS_CCD(self.rutas)
+        self.rutas: list[str] | None = verificar_rutas()
+        if self.rutas == None:
+            self.progressbar.stop()
+            return
+        self.reporte: SMS_CCD = SMS_CCD(self.rutas)
         try:
-            inicio = time.time()
-            resultados = self.reporte.actualizar_base_celulares()
-            fin = time.time()
-            self.proceso1 = fin - inicio
-            total_deudores = resultados[0]
-            total_celulares = resultados[1]
+            inicio: float = time.time()
+            resultados: list[int] = self.reporte.actualizar_base_celulares()
+            fin: float = time.time()
+            self.proceso1: float = fin - inicio
+            total_deudores: int = resultados[0]
+            total_celulares: int = resultados[1]
             if total_deudores == total_celulares:
-                messagebox.showinfo("INFO", "Todos los socios["+str(total_deudores)+"] cuentan con celulares.")
+                messagebox.showinfo("INFO", f"Todos los socios[{total_deudores}] cuentan con celulares.")
             else:
                 messagebox.showinfo(
                     "INFO", "BASE DE CELULARES ACTUALIZADA!\n"
-                    + "\n- CON CELULAR: " + str(total_celulares) 
-                    + "\n- SIN CELULAR: " + str(total_deudores-total_celulares)
-                    + "\n- TOTAL: " + str(total_deudores))
+                    + f"\n- CON CELULAR: {total_celulares}"
+                    + f"\n- SIN CELULAR: {total_deudores-total_celulares}"
+                    + f"\n- TOTAL: {total_deudores}")
         except Exception as e:
             messagebox.showerror("ERROR", "Algo salió mal. Por favor, intente nuevamente.\n\nDetalles: " + str(e))
         finally:
@@ -78,21 +81,21 @@ class App_SMS():
     def accion_boton2(self) -> None:
         self.progressbar.start()
         try:
-            inicio = time.time()
+            inicio: float = time.time()
             self.reporte.exportar_deudores()
-            fin = time.time()
-            self.proceso2 = fin - inicio
-            self.inicio_sap = time.time()
+            fin: float = time.time()
+            self.proceso2: float = fin - inicio
+            self.inicio_sap: float = time.time()
         except Exception as e:
             messagebox.showerror("ERROR", "Algo salió mal. Por favor, intente nuevamente.\n\nDetalles: " + str(e))
         finally:
             self.progressbar.stop()
     
     def accion_boton3(self) -> None:
-        self.fin_sap = time.time()
+        self.fin_sap: float = time.time()
         self.progressbar.start()
         try:
-            inicio = time.time()
+            inicio: float = time.time()
             if self.var_hoja_calculo.get() == True:
                 self.reporte.preparar_fbl5n_hoja_calculo()
             else:
@@ -100,17 +103,17 @@ class App_SMS():
             self.reporte.preparar_recaudacion()
             self.reporte.preparar_modelo()
             self.reporte.preparar_zfir60()
-            resultados = self.reporte.return_resultados()
-            fin = time.time()
-            self.proceso3 = fin - inicio
-            ld_equipos = resultados[0]
-            ld_recaudacion = resultados[1]
-            zfir60 = resultados[2]
+            resultados: list[int] = self.reporte.return_resultados()
+            fin: float = time.time()
+            self.proceso3: float = fin - inicio
+            ld_equipos: int = resultados[0]
+            ld_recaudacion: int = resultados[1]
+            zfir60: int = resultados[2]
             messagebox.showinfo(
                 "INFO", "REGISTROS VALIDADOS:\n" 
-                + "\n- En LD de EQUIPOS: " + str(ld_equipos)
-                + "\n- En LD de RECAUDACION: " + str(ld_recaudacion)
-                + "\n- Con Deuda Vencida (ZFIR60): " + str(zfir60))
+                + f"\n- En LD de EQUIPOS: {ld_equipos}"
+                + f"\n- En LD de RECAUDACION: {ld_recaudacion}"
+                + f"\n- Con DEUDA VENCIDA: {zfir60}")
         except Exception as e:
             messagebox.showerror("ERROR", "Algo salió mal. Por favor, intente nuevamente.\n\nDetalles: " + str(e))
         finally:
@@ -119,14 +122,18 @@ class App_SMS():
     def accion_boton4(self) -> None:
         self.progressbar.start()
         try:
-            inicio = time.time()
-            lista_nivel_1, lista_ld = self.reporte.exportar_archivos_txt()
-            signal, result = self.reporte.generar_apoyos()
-            fin = time.time()
-            proceso4 = fin - inicio
-            self.tiempo_proceso = round((self.proceso1 + self.proceso2 + self.proceso3 + proceso4),2)
-            tiempo_sap = round((self.fin_sap - self.inicio_sap),2)
-            self.tiempo_total = round((self.tiempo_proceso + tiempo_sap),2)
+            inicio: float = time.time()
+            resultados_txt: list[str] = self.reporte.exportar_archivos_txt()
+            resultados_apoyo: list[bool, int] = self.reporte.generar_apoyos()
+            lista_nivel_1: str = resultados_txt[0]
+            lista_ld: str = resultados_txt[1]
+            signal: bool = resultados_apoyo[0]
+            total_apoyos: int = resultados_apoyo[1]
+            fin: float = time.time()
+            proceso4: float = fin - inicio
+            self.tiempo_proceso: float = round((self.proceso1 + self.proceso2 + self.proceso3 + proceso4),2)
+            tiempo_sap: float = round((self.fin_sap - self.inicio_sap),2)
+            self.tiempo_total: float = round((self.tiempo_proceso + tiempo_sap),2)
             
             self.entry_nivel1.configure(state="normal")
             self.entry_nivel1.delete(0, "end")
@@ -140,24 +147,25 @@ class App_SMS():
             # Mensajes listos
             messagebox.showinfo(
                 "SMS C&CD", "MENSAJES LISTOS:"
-                + "\n- LD: " + lista_ld + " destinatarios." 
-                + "\n- Nivel 1: " + lista_nivel_1 + " destinatarios."
-                + "\n\nTIEMPOS DE EJECUCIÓN:"
-                + "\n- Proceso: " + str(self.tiempo_proceso) + " segundos."
-                + "\n- SAP: " + str(tiempo_sap) + " segundos."
-                + "\n- Total: " + str(self.tiempo_total) + " segundos.")
+                + f"\n- LD: {lista_ld} destinatarios." 
+                + f"\n- Nivel 1: {lista_nivel_1} destinatarios."
+                + f"\n\nTIEMPOS DE EJECUCIÓN:"
+                + f"\n- Proceso: {self.tiempo_proceso} segundos."
+                + f"\n- SAP: {tiempo_sap} segundos."
+                + f"\n- Total: {self.tiempo_total} segundos.")
+            
             if signal:
                 messagebox.showinfo(
                     "SMS C&CD", "MENSAJES APOYOS LISTOS:"
-                    + "\n- Registros validados: " + str(result) + " destinatarios.")
-            os.startfile(self.rutas[3]+"/CARGAS")
+                    + f"\n- Registros validados: {total_apoyos} destinatarios.")
+            os.startfile(f"{self.rutas[3]}/CARGAS")
         except Exception as e:
             messagebox.showerror("ERROR", "Algo salió mal. Por favor, intente nuevamente.\nDetalles: " + str(e))
         finally:
             self.progressbar.stop()
     
     def confirmar_configuracion(self) -> None:
-        self.rutas = verificar_rutas()
+        self.rutas: list[str] | None = verificar_rutas()
         self.ventana_config.destroy()
     
     def ventana_rutas(self) -> None:
@@ -223,19 +231,19 @@ class App_SMS():
         os.startfile(resource_path("src/utils/REGLA.xlsx"))
     
     def centrar_ventana(self, ventana: CTk) -> None: 
-        screen_width = ventana.winfo_screenwidth()
-        screen_height = ventana.winfo_screenheight()
+        screen_width: int  = ventana.winfo_screenwidth()
+        screen_height: int  = ventana.winfo_screenheight()
         ventana.update_idletasks()
-        ventana_width = ventana.winfo_reqwidth()
-        ventana_height = ventana.winfo_reqheight()
-        x = (screen_width - ventana_width) // 2
-        y = (screen_height - ventana_height) // 2
+        ventana_width: int  = ventana.winfo_reqwidth()
+        ventana_height: int  = ventana.winfo_reqheight()
+        x: int  = (screen_width - ventana_width) // 2
+        y: int  = (screen_height - ventana_height) // 2
         ventana.geometry(f"+{x}+{y}")
     
     def crear_app(self) -> None:
-        self.app = CTk()
+        self.app: CTk = CTk()
         self.app.title("SMS C&CD")
-        self.icon_path = resource_path("src/images/icono.ico")
+        self.icon_path: str = resource_path("src/images/icono.ico")
         if os.path.isfile(self.icon_path):
             self.app.iconbitmap(self.icon_path)
         else:

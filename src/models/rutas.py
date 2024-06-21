@@ -1,5 +1,5 @@
 from ..database.conexion import get_rutas, set_ruta
-from customtkinter import filedialog
+from customtkinter import CTk, filedialog
 from tkinter import messagebox
 
 
@@ -26,23 +26,27 @@ def verificar_rutas() -> list[str] | None:
     except Exception as ex:
         messagebox.showerror("Error", "Error al verificar las rutas:" + str(ex))
 
-def seleccionar_archivo(nombre: str) -> None:
+def seleccionar_archivo(nombre: str, ventana: CTk) -> None:
     try:
+        ventana.attributes("-disabled", True)
         ruta: str = filedialog.askopenfilename(
             initialdir="/",
             title="Seleccionar archivo " + nombre,
             filetypes=(("Archivos de Excel", "*.xlsx"), ("Todos los archivos", "*.*"))
         )
         set_ruta(ruta, nombre)
+        ventana.attributes("-disabled", False)
     except Exception as ex:
         messagebox.showerror("Error", "Error al seleccionar el archivo:" + str(ex))
 
-def seleccionar_carpeta(nombre: str) -> None:
+def seleccionar_carpeta(nombre: str, ventana: CTk) -> None:
     try:
+        ventana.attributes("-disabled", True)
         ruta: str = filedialog.askdirectory(
             initialdir="/",
             title="Seleccionar carpeta " + nombre
         )
         set_ruta(ruta, nombre)
+        ventana.attributes("-disabled", False)
     except Exception as ex:
         messagebox.showerror("Error", "Error al seleccionar la carpeta:" + str(ex))

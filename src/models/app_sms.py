@@ -3,6 +3,7 @@ from .rutas import *
 from ..utils.resource_path import *
 from tkinter import messagebox, Entry
 from customtkinter import *
+from tkinter import Tk
 import threading
 import time
 
@@ -171,6 +172,7 @@ class App_SMS():
     def ventana_rutas(self) -> None:
         self.ventana_config =CTkToplevel(self.app)
         self.ventana_config.title("Rutas")
+        self.ventana_config.attributes("-topmost", True)
         self.ventana_config.resizable(False, False)
         self.ventana_config.grab_set()
         self.ventana_config.focus_set()
@@ -185,7 +187,7 @@ class App_SMS():
         file_dacxanalista = CTkButton(
             frame_botones1, text="DACxANALISTA", font=("Calibri",12), text_color="black",
             fg_color="transparent", border_color="black", border_width=2, hover_color="#d11515",
-            corner_radius=5, command=lambda: seleccionar_archivo("DACXANALISTA"))
+            corner_radius=5, command=lambda: seleccionar_archivo("DACXANALISTA", self.ventana_config))
         file_dacxanalista.pack(fill="both", expand=True, padx=10, pady=10)
         
         titulo2 = CTkLabel(self.ventana_config, text="Seleccionar Carpetas", font=("Calibri",12,"bold"))
@@ -198,25 +200,25 @@ class App_SMS():
         folder_modelo = CTkButton(
             frame_botones2, text="MODELO", font=("Calibri",12), text_color="black", 
             fg_color="transparent", border_color="black", border_width=2, hover_color="#d11515", 
-            width=100, corner_radius=5, command=lambda: seleccionar_carpeta("MODELO"))
+            width=100, corner_radius=5, command=lambda: seleccionar_carpeta("MODELO", self.ventana_config))
         folder_modelo.grid(row=0, column=0, padx=10, pady=10, sticky="nsew")
         
         folder_zfir = CTkButton(
             frame_botones2, text="ZFIR60", font=("Calibri",12), text_color="black",
             fg_color="transparent", border_color="black", border_width=2, hover_color="#d11515",
-            width=100, corner_radius=5, command=lambda: seleccionar_carpeta("ZFIR60"))
+            width=100, corner_radius=5, command=lambda: seleccionar_carpeta("ZFIR60", self.ventana_config))
         folder_zfir.grid(row=0, column=1, padx=(0,10), pady=10, sticky="nsew")
         
         folder_bases = CTkButton(
             frame_botones2, text="SMS CCD", font=("Calibri",12), text_color="black",
             fg_color="transparent", border_color="black", border_width=2, hover_color="#d11515",
-            width=100, corner_radius=5, command=lambda: seleccionar_carpeta("SMS CCD"))
+            width=100, corner_radius=5, command=lambda: seleccionar_carpeta("SMS CCD", self.ventana_config))
         folder_bases.grid(row=1, column=0, padx=10, pady=10, sticky="nsew")
         
         folder_cargas = CTkButton(
             frame_botones2, text="VACACIONES", font=("Calibri",12), text_color="black",
             fg_color="transparent", border_color="black", border_width=2, hover_color="#d11515",
-            width=100, corner_radius=5, command=lambda: seleccionar_carpeta("VACACIONES"))
+            width=100, corner_radius=5, command=lambda: seleccionar_carpeta("VACACIONES", self.ventana_config))
         folder_cargas.grid(row=1, column=1, padx=(0,10), pady=10, sticky="nsew")
         
         boton_confirmar = CTkButton(
@@ -231,18 +233,20 @@ class App_SMS():
         os.startfile(resource_path("src/utils/REGLA.xlsx"))
     
     def centrar_ventana(self, ventana: CTk) -> None: 
-        screen_width: int  = ventana.winfo_screenwidth()
-        screen_height: int  = ventana.winfo_screenheight()
+        pantalla_ancho: int = ventana.winfo_screenwidth()
+        pantalla_alto: int = ventana.winfo_screenheight()
         ventana.update_idletasks()
-        ventana_width: int  = ventana.winfo_reqwidth()
-        ventana_height: int  = ventana.winfo_reqheight()
-        x: int  = (screen_width - ventana_width) // 2
-        y: int  = (screen_height - ventana_height) // 2
-        ventana.geometry(f"+{x}+{y}")
+        ventana_ancho: int = ventana.winfo_width()
+        ventana_alto: int = ventana.winfo_height()
+        x: int = (pantalla_ancho - ventana_ancho) // 2
+        y: int = (pantalla_alto - ventana_alto) // 2
+        ventana.geometry(f"{x}+{y}")
     
     def crear_app(self) -> None:
-        self.app: CTk = CTk()
+        self.app = CTk()
         self.app.title("SMS C&CD")
+        self.app.attributes("-topmost", True)
+        
         self.icon_path: str = resource_path("src/images/icono.ico")
         if os.path.isfile(self.icon_path):
             self.app.iconbitmap(self.icon_path)

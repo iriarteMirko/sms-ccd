@@ -3,7 +3,6 @@ from .rutas import *
 from ..utils.resource_path import *
 from tkinter import messagebox, Entry
 from customtkinter import *
-from tkinter import Tk
 import threading
 import time
 

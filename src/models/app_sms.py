@@ -171,6 +171,7 @@ class App_SMS():
     def ventana_rutas(self) -> None:
         self.ventana_config =CTkToplevel(self.app)
         self.ventana_config.title("Rutas")
+        self.ventana_config.iconbitmap(self.icon_path)
         self.ventana_config.attributes("-topmost", True)
         self.ventana_config.resizable(False, False)
         self.ventana_config.grab_set()
@@ -239,7 +240,7 @@ class App_SMS():
         ventana_alto: int = ventana.winfo_height()
         x: int = (pantalla_ancho - ventana_ancho) // 2
         y: int = (pantalla_alto - ventana_alto) // 2
-        ventana.geometry(f"{x}+{y}")
+        ventana.geometry(f"+{x}+{y}")
     
     def crear_app(self) -> None:
         self.app = CTk()

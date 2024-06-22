@@ -36,6 +36,7 @@ def seleccionar_archivo(nombre: str, ventana: CTk) -> None:
         )
         set_ruta(ruta, nombre)
         ventana.attributes("-disabled", False)
+        ventana.attributes("-topmost", True)
     except Exception as ex:
         messagebox.showerror("Error", "Error al seleccionar el archivo:" + str(ex))
 
@@ -48,5 +49,6 @@ def seleccionar_carpeta(nombre: str, ventana: CTk) -> None:
         )
         set_ruta(ruta, nombre)
         ventana.attributes("-disabled", False)
+        ventana.attributes("-topmost", True)
     except Exception as ex:
         messagebox.showerror("Error", "Error al seleccionar la carpeta:" + str(ex))

@@ -6,15 +6,9 @@ from tkinter import messagebox
 def verificar_rutas() -> list[str] | None:
     try:
         rutas: list[tuple[str, str]] = get_rutas()
-        rutas_general: list[str] = []
-        rutas_vacias: list[str] = []
-        for ruta in rutas:
-            if ruta[1] == None or ruta[1] == "":
-                rutas_vacias.append(ruta[0])
-                if ruta[1] == None:
-                    ruta[1] = ""
-            rutas_general.append(ruta[1])
-        if len(rutas_vacias) != 0:
+        rutas_general = [ruta[1] for ruta in rutas if ruta[1] is not None]
+        rutas_vacias = [ruta[0] for ruta in rutas if not ruta[1]]
+        if rutas_vacias:
             messagebox.showwarning(
                 "ADVERTENCIA", 
                 "Las siguientes rutas no han sido seleccionadas:" 

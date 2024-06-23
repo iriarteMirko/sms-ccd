@@ -8,6 +8,10 @@ import time
 
 
 class App_SMS():
+    def __init__(self) -> None:
+        self.indicador_boton: dict[int, bool] = {1: False, 2: False, 3: False, 4: False}
+        
+    
     def deshabilitar_botones(self) -> None:
         self.boton1.configure(state="disabled")
         self.boton2.configure(state="disabled")
@@ -73,12 +77,30 @@ class App_SMS():
                     + f"\n- CON CELULAR: {total_celulares}"
                     + f"\n- SIN CELULAR: {total_deudores-total_celulares}"
                     + f"\n- TOTAL: {total_deudores}")
+            self.indicador_boton[1] = True
+            self.indicador_boton[2] = False
+            self.indicador_boton[3] = False
+            self.indicador_boton[4] = False
         except Exception as e:
             messagebox.showerror("ERROR", "Algo salió mal. Por favor, intente nuevamente.\n\nDetalles: " + str(e))
         finally:
             self.progressbar.stop()
     
     def accion_boton2(self) -> None:
+        paso: int = 2
+        for k, v in self.indicador_boton.items():
+            if k < paso and not v:
+                messagebox.showwarning(
+                    "ADVERTENCIA", 
+                    f"Se deben completar los pasos anteriores en órden para continuar.\n\nCOMPLETAR EL PASO [{k}]")
+                self.progressbar.stop()
+                return
+            elif k > paso:
+                self.indicador_boton[k] = False
+            elif k == paso and v:
+                messagebox.showinfo("INFO", "Ya se ha completado el PASO [2].")
+                self.progressbar.stop()
+                return
         self.progressbar.start()
         try:
             inicio: float = time.time()
@@ -86,12 +108,27 @@ class App_SMS():
             fin: float = time.time()
             self.proceso2: float = fin - inicio
             self.inicio_sap: float = time.time()
+            self.indicador_boton[2] = True
         except Exception as e:
             messagebox.showerror("ERROR", "Algo salió mal. Por favor, intente nuevamente.\n\nDetalles: " + str(e))
         finally:
             self.progressbar.stop()
     
     def accion_boton3(self) -> None:
+        paso: int = 3
+        for k, v in self.indicador_boton.items():
+            if k < paso and not v:
+                messagebox.showwarning(
+                    "ADVERTENCIA", 
+                    f"Se deben completar los pasos anteriores en órden para continuar.\n\nCOMPLETAR EL PASO [{k}]")
+                self.progressbar.stop()
+                return
+            elif k > paso:
+                self.indicador_boton[k] = False
+            elif k == paso and v:
+                messagebox.showinfo("INFO", "Ya se ha completado el PASO [3].")
+                self.progressbar.stop()
+                return
         self.fin_sap: float = time.time()
         self.progressbar.start()
         try:
@@ -111,15 +148,24 @@ class App_SMS():
             zfir60: int = resultados[2]
             messagebox.showinfo(
                 "INFO", "REGISTROS VALIDADOS:\n" 
-                + f"\n- En LD de EQUIPOS: {ld_equipos}"
-                + f"\n- En LD de RECAUDACION: {ld_recaudacion}"
-                + f"\n- Con DEUDA VENCIDA: {zfir60}")
+                + f"\n- LD EQUIPOS: {ld_equipos}"
+                + f"\n- LD RECAUDACION: {ld_recaudacion}"
+                + f"\n- DEUDA VENCIDA: {zfir60}")
+            self.indicador_boton[3] = True
         except Exception as e:
             messagebox.showerror("ERROR", "Algo salió mal. Por favor, intente nuevamente.\n\nDetalles: " + str(e))
         finally:
             self.progressbar.stop()
     
     def accion_boton4(self) -> None:
+        paso: int = 4
+        for k, v in self.indicador_boton.items():
+            if k < paso and not v:
+                messagebox.showwarning(
+                    "ADVERTENCIA", 
+                    f"Se deben completar los pasos anteriores en órden para continuar.\n\nCOMPLETAR EL PASO [{k}]")
+                self.progressbar.stop()
+                return
         self.progressbar.start()
         try:
             inicio: float = time.time()
@@ -155,10 +201,11 @@ class App_SMS():
             # Mensajes apoyos
             if signal:
                 messagebox.showinfo(
-                    "SMS C&CD", "MENSAJES APOYOS LISTOS:"
-                    + f"\n- Registros validados: {total_apoyos} destinatarios.")
+                    "SMS C&CD", "APOYOS LISTOS:\n"
+                    + f"\n- APOYOS: {total_apoyos} destinatarios.")
             # Abrir carpeta CARGAS
             os.startfile(f"{self.rutas[3]}/CARGAS")
+            self.indicador_boton[4] = True
         except Exception as e:
             messagebox.showerror("ERROR", "Algo salió mal. Por favor, intente nuevamente.\nDetalles: " + str(e))
         finally:

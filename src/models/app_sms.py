@@ -283,8 +283,8 @@ class App_SMS():
         pantalla_ancho: int = ventana.winfo_screenwidth()
         pantalla_alto: int = ventana.winfo_screenheight()
         ventana.update_idletasks()
-        ventana_ancho: int = ventana.winfo_width()
-        ventana_alto: int = ventana.winfo_height()
+        ventana_ancho: int = ventana.winfo_reqwidth()
+        ventana_alto: int = ventana.winfo_reqheight()
         x: int = (pantalla_ancho - ventana_ancho) // 2
         y: int = (pantalla_alto - ventana_alto) // 2
         ventana.geometry(f"+{x}+{y}")
